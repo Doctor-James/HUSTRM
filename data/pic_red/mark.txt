@@ -1,0 +1,9 @@
+background:0
+hero:1
+engineer:2
+standard_3:3
+standard_4:4
+statdard_5:5
+outpost:6
+base:7
+sentry:8
