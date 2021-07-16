@@ -187,6 +187,7 @@ namespace ly {
         bool g_bWhiteBalance;                       ///< WhiteBalance support flag
         bool g_bAcquisitionFlag;                    ///< Thread running flag
 
+
         AcquisitionThread threadParam;
         //pthread_mutex_t mutex;
         ExposureGain exposure_gain;                 ///< Camera exposure and gain param
@@ -194,6 +195,7 @@ namespace ly {
         WhiteBalance white_balance;                 ///< Camera whitebalance param
 
     };
+
 }
 
 

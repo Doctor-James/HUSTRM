@@ -453,6 +453,8 @@ namespace ly {
 
         while (*(threadParam->g_AcquisitionFlag)) {
             // Get a frame from Queue
+            time count1;
+            count1.countBegin();
             emStatus = GXDQBuf(threadParam->m_hDevice, &pFrameBuffer, 1000);
             if (emStatus != GX_STATUS_SUCCESS) {
                 if (emStatus == GX_STATUS_TIMEOUT) {
@@ -505,6 +507,8 @@ namespace ly {
                     GetErrorString(emStatus);
                     break;
                 }
+                count1.countEnd();
+                std::cout<<count1.getTimeMs()<<std::endl;
             }
         }
         printf("<Acquisition thread Exit!>\n");

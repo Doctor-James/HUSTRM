@@ -9,6 +9,7 @@ add_library(
         src/tool_config.cpp
         src/tool_log.cpp
         src/tool_time.cpp
+		src/tool_Drawcurve.cpp
 )
 target_link_libraries(
         tools

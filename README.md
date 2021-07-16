@@ -1,2 +1,1 @@
-# armor
-RM-armorDetector
+AIM_HUST

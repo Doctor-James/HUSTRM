@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../driver/serialPort/inc/serialPort.h
+unistd.h
+-
+termios.h
+-
+cstring
+-
+fcntl.h
+-
+string
+-
+boost/asio.hpp
+-
+boost/bind.hpp
+-
+
+/home/zjl/code/RM2022/AIM_HUST/driver/serialPort/src/serialPort.cpp
+serialPort.h
+/home/zjl/code/RM2022/AIM_HUST/driver/serialPort/src/serialPort.h
+iostream
+-
+

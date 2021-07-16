@@ -3,7 +3,7 @@
 
 #include<opencv2/opencv.hpp>
 #include <vector>
-#include "tool_config.h"
+#include "tools.h"
 #include "armor.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -68,7 +68,7 @@ namespace ly
         float distance;
         int debug_ = 0;
         time counter_;
-
+        DrawCurve DrawCurve_;
 #ifdef DEBUG_TRANS
         inline void glDrawColouredCuboid(const Sophus::SE3 T, GLfloat a = 0.175f,GLfloat b= 0.004f,GLfloat c=0.055f);
         static void* visual(void* __this);

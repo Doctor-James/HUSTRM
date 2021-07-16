@@ -75,7 +75,7 @@ namespace ly
                 0, 0, 1, 0,
                 0, 0, 0, 1);
         setIdentity(KF_.measurementMatrix);
-        setIdentity(KF_.processNoiseCov, cv::Scalar::all(1e-5));
+        setIdentity(KF_.processNoiseCov, cv::Scalar::all(1e-4));
         setIdentity(KF_.measurementNoiseCov, cv::Scalar::all(1e-1));
         setIdentity(KF_.errorCovPost, cv::Scalar::all(1));
         randn(KF_.statePost, cv::Scalar::all(0), cv::Scalar::all(0.1));
@@ -86,6 +86,8 @@ namespace ly
 //        pthread_t tids;
 //        int ret = pthread_create(&tids, NULL, visual, (void*)this);
 //#endif
+
+        DrawCurve_.ClearSaveData();
     }
     void transform::setimu(float pitch, float yaw, float roll)
     {
@@ -188,7 +190,7 @@ namespace ly
         sendData_.pitch = pitch*100;
         sendData_.yaw = yaw*100;
         sendData_.distance = distance*10;
-
+        DrawCurve_.InsertData(armor_.translation()[0],KF_prediction.at<float>(0),"real","predict");
         if(debug_ <5)
         {
             debug_++;

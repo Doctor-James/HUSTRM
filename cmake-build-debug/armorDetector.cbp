@@ -1,0 +1,661 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="armorDetector"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\..\;CMake Files\..\..\..\..\..\usr\;CMake Files\..\..\..\..\..\usr\local\;CMake Files\..\..\..\..\..\usr\local\share\;CMake Files\..\..\..\..\..\usr\local\share\OpenCV\;CMake Files\..\..\..\..\..\usr\local\share\sophus\;CMake Files\..\..\..\..\..\usr\local\share\sophus\cmake\;CMake Files\..\..\..\..\..\usr\local\lib\;CMake Files\..\..\..\..\..\usr\local\lib\cmake\;CMake Files\..\..\..\..\..\usr\local\lib\cmake\Pangolin\;CMake Files\armor\;CMake Files\tool\;CMake Files\driver\;CMake Files\driver\serialPort\;CMake Files\driver\camera\;CMake Files\solvePNP\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="thread">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/libthread.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/serialPort/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/hik_include"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/dahen_include"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/inc"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/thread/inc"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 thread"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="thread/fast">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/libthread.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/serialPort/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/hik_include"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/dahen_include"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/inc"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/thread/inc"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 thread/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="armorDetector">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armorDetector" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/serialPort/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/hik_include"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/dahen_include"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/thread/inc"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 armorDetector"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="armorDetector/fast">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armorDetector" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/serialPort/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/hik_include"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/dahen_include"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/thread/inc"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 armorDetector/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="armor">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor/libarmor.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/../tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/../thread/inc"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/../solvePNP/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/../driver/camera/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/../driver/serialPort/inc"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor/Makefile&quot;  VERBOSE=1 armor"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="armor/fast">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor/libarmor.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/../tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/../thread/inc"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/../solvePNP/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/../driver/camera/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/armor/../driver/serialPort/inc"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor/Makefile&quot;  VERBOSE=1 armor/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/armor/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="tools">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool/libtools.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/tool/inc"/>
+					<Add directory="/usr/local/include/glog"/>
+					<Add directory="/lib/config/include/json"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool/Makefile&quot;  VERBOSE=1 tools"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="tools/fast">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool/libtools.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/tool/inc"/>
+					<Add directory="/usr/local/include/glog"/>
+					<Add directory="/lib/config/include/json"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool/Makefile&quot;  VERBOSE=1 tools/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/tool/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="serialPort">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort/libserialPort.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/serialPort/inc"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort/Makefile&quot;  VERBOSE=1 serialPort"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="serialPort/fast">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort/libserialPort.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/serialPort/inc"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort/Makefile&quot;  VERBOSE=1 serialPort/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/serialPort/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="camera">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera/libcamera.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/../../tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/hik_include"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/dahen_include"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera/Makefile&quot;  VERBOSE=1 camera"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="camera/fast">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera/libcamera.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/../../tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/hik_include"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/driver/camera/lib/dahen_include"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera/Makefile&quot;  VERBOSE=1 camera/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/driver/camera/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="trans">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/libtrans.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../armor/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../thread/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../driver/serialPort/inc"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/math"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 trans"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="trans/fast">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/libtrans.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../armor/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../thread/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../driver/serialPort/inc"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/math"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 trans/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="solvePNP">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/libsolvePNP.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../armor/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../thread/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../driver/serialPort/inc"/>
+					<Add directory="/usr/include/math"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 solvePNP"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="solvePNP/fast">
+				<Option output="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/libsolvePNP.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../tool/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../armor/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../thread/inc"/>
+					<Add directory="/home/zjl/code/RM2022/AIM_HUST/solvePNP/../driver/serialPort/inc"/>
+					<Add directory="/usr/include/math"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/local/include/opencv"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 solvePNP/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/armor/src/RM_BUFF.cpp">
+			<Option target="thread"/>
+			<Option target="armor"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/armor/src/armor.cpp">
+			<Option target="thread"/>
+			<Option target="armor"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/armor/src/buff.cpp">
+			<Option target="thread"/>
+			<Option target="armor"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/armor/src/lightBar.cpp">
+			<Option target="thread"/>
+			<Option target="armor"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/armor/src/score.cpp">
+			<Option target="armor"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/armorDetector.cpp">
+			<Option target="armorDetector"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/armorDetector.h">
+			<Option target="armorDetector"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/driver/camera/src/DAHEN_camera.cpp">
+			<Option target="thread"/>
+			<Option target="camera"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/driver/camera/src/GxCamera.cpp">
+			<Option target="thread"/>
+			<Option target="camera"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/driver/camera/src/HIK_camera.cpp">
+			<Option target="thread"/>
+			<Option target="camera"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/driver/camera/src/camera.cpp">
+			<Option target="camera"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/driver/serialPort/src/serialPort.cpp">
+			<Option target="thread"/>
+			<Option target="serialPort"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/main.cpp">
+			<Option target="armorDetector"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/main.h">
+			<Option target="armorDetector"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/solvePNP/src/solvePNP.cpp">
+			<Option target="thread"/>
+			<Option target="solvePNP"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/solvePNP/src/transform.cpp">
+			<Option target="thread"/>
+			<Option target="trans"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/thread/src/armorThread.cpp">
+			<Option target="thread"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/thread/src/cameraThread.cpp">
+			<Option target="thread"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/thread/src/lightBarThread.cpp">
+			<Option target="thread"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/thread/src/preProcessThread.cpp">
+			<Option target="thread"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/thread/src/serialPortReadThread.cpp">
+			<Option target="thread"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/thread/src/serialPortWriteThread.cpp">
+			<Option target="thread"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/thread/src/thread.cpp">
+			<Option target="thread"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/tool/src/tool_Drawcurve.cpp">
+			<Option target="tools"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/tool/src/tool_config.cpp">
+			<Option target="tools"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/tool/src/tool_log.cpp">
+			<Option target="tools"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/tool/src/tool_time.cpp">
+			<Option target="tools"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/share/OpenCV/OpenCVConfig-version.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\share\OpenCV\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/share/OpenCV/OpenCVConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\share\OpenCV\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/share/OpenCV/OpenCVModules-release.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\share\OpenCV\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/share/OpenCV/OpenCVModules.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\share\OpenCV\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/share/sophus/cmake/SophusConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\share\sophus\cmake\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/share/sophus/cmake/SophusConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\share\sophus\cmake\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/share/sophus/cmake/SophusTargets.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\share\sophus\cmake\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/lib/cmake/Pangolin/PangolinConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\lib\cmake\Pangolin\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/lib/cmake/Pangolin/PangolinConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\lib\cmake\Pangolin\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/lib/cmake/Pangolin/PangolinTargets-release.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\lib\cmake\Pangolin\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/../../../../../usr/local/lib/cmake/Pangolin/PangolinTargets.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\lib\cmake\Pangolin\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/armor/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\armor\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/tool/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\tool\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/driver/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\driver\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/driver/serialPort/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\driver\serialPort\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/driver/camera/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\driver\camera\"/>
+		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/solvePNP/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\solvePNP\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

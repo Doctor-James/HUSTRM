@@ -3,6 +3,7 @@
 
 #include "tool_time.h"
 #include "tool_config.h"
+#include "tool_Drawcurve.h"
 #include <opencv2/opencv.hpp>
 
 namespace ly{

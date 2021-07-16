@@ -1,7 +1,7 @@
 {
    "cam_device": {
-      "deviceType" :1,
-      "videoPath" :"/home/zjl/code/RM2021/AIM_HUST_5.21/1.mp4",
+      "deviceType" :3,
+      "videoPath" :"../video/3.avi",
       "picturePath" :"/home/zjl/code/AIM_HUST/video/1.jpg",
       "picNum": 27,
       "HIK_CAM": "none",

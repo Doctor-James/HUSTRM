@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../tool/inc/tool_Drawcurve.h
+iostream
+-
+fstream
+-
+opencv2/opencv.hpp
+-
+opencv2/imgproc.hpp
+-
+opencv2/highgui.hpp
+../tool/inc/opencv2/highgui.hpp
+vector
+-
+
+/home/zjl/code/RM2022/AIM_HUST/tool/src/tool_Drawcurve.cpp
+tool_Drawcurve.h
+/home/zjl/code/RM2022/AIM_HUST/tool/src/tool_Drawcurve.h
+

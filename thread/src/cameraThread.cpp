@@ -20,12 +20,13 @@ namespace ly{
 //                start(1000);//1KHZ
                 break;
             case DAH_CAM:
-//                cam_ = new DAH_Camera();
                 cam_new = new GxCamera();
-                start(5000);
+//#define GxCamera
+                process();
                 break;
             case PIC:
                 cam_ = new picture(config.picPath);
+#define PICTURE
                 start(10000);//100帧相机
                 break;
             case VIDEO:
@@ -35,6 +36,7 @@ namespace ly{
             default:
                 break;
         }
+
     }
 
     /**
@@ -42,12 +44,8 @@ namespace ly{
      */
     void cameraThread::process()
     {
-//        if(!isOpen){
-//            isOpen = true;
-//        }
-//        else{
-//            return;
-//        }
+
+#ifdef GxCamera
         //init camrea lib
         cam_new->initLib();
         //   open device      SN号
@@ -60,28 +58,29 @@ namespace ly{
         //   ROI             Width  Height        X       Y
         cam_new->setRoiParam(width, height, OffsetX, OffsetY);
         //   ExposureGain          autoExposure  autoGain  ExposureTime  AutoExposureMin  AutoExposureMax  Gain(<=16)  AutoGainMin  AutoGainMax  GrayValue
-        cam_new->setExposureGainParam( false, false, 2000, 1000, 3000, 3, 5, 16, 127);
+        cam_new->setExposureGainParam( false, false, 5000, 1000, 3000, 3, 5, 16, 127);
         //   WhiteBalance             Applied?       light source type
         cam_new->setWhiteBalanceParam(    false,    GX_AWB_LAMP_HOUSE_ADAPTIVE);
         //   Acquisition Start!
         cam_new->acquisitionStart(&frame_);
+#endif
 
-         //复制两次，分别用于灯条识别和装甲id识别
-         //若测试图片或视频要下面的部分
-//        Mat temp = cam_->getFrame();
-//        mutex_pic_.lock();
-//        frame_.mat = temp.mat.clone();
-//        mutex_pic_.unlock();
-//        mutex_pic2_.lock();
-//        frame2_.mat = frame_.mat.clone();
-//        mutex_pic2_.unlock();
-//
-//        mutex_pic_.lock();
-//        frame_ = val_out;
-//        mutex_pic_.unlock();
-//        mutex_pic2_.lock();
-//        frame2_ = frame_;
-//        mutex_pic2_.unlock();
+#ifdef PICTURE
+        Mat temp = cam_->getFrame();
+        mutex_pic_.lock();
+        frame_.mat = temp.mat.clone();
+        mutex_pic_.unlock();
+        mutex_pic2_.lock();
+        frame2_.mat = frame_.mat.clone();
+        mutex_pic2_.unlock();
+
+        mutex_pic_.lock();
+        frame_ = val_out;
+        mutex_pic_.unlock();
+        mutex_pic2_.lock();
+        frame2_ = frame_;
+        mutex_pic2_.unlock();
+#endif
     }
     /**
      * @brief 返回图片信息，相机和非相机两种情况
