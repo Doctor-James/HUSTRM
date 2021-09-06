@@ -1,12 +1,21 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @Author: Eugene
+ * @Date: 2021-07-12 20:12:13
+ * @LastEditors: Andy
+ * @LastEditTime: 2021-07-22 20:17:46
+ */
 #include "cameraThread.h"
 
-namespace ly{
+namespace ly
+{
 
     /**
      * @brief 根据配置文件初始化不同的类
      * @param config 设备配置参数
      */
-    cameraThread::cameraThread(const cam_device& config, cam_param camera)
+    cameraThread::cameraThread(const cam_device &config, cam_param camera)
     {
         device = config;
         cameraParam = camera;
@@ -15,94 +24,97 @@ namespace ly{
 
         switch (type_)
         {
-            case HIK_CAM:
-//                cam_ = new HIK_camera();
-//                start(1000);//1KHZ
-                break;
-            case DAH_CAM:
-                cam_new = new GxCamera();
-//#define GxCamera
-                process();
-                break;
-            case PIC:
-                cam_ = new picture(config.picPath);
-#define PICTURE
-                start(10000);//100帧相机
-                break;
-            case VIDEO:
-                cam_ = new video(config.videoPath);
-                start(10000);//100帧相机
-                break;
-            default:
-                break;
+        case DAH_CAM:
+            cam_new = new GxCamera();
+            start(1000);
+            break;
+        case PIC:
+            cam_ = new picture(config.picPath);
+            start(10000); //100帧相机
+            break;
+        case VIDEO:
+            cam_ = new video(config.videoPath);
+            start(10000); //100帧相机
+            break;
+        default:
+            break;
         }
 
     }
-
     /**
      * @brief 多线程获取相机信息
      */
     void cameraThread::process()
     {
+        //counter_.countBegin();
+        if (type_ == DAH_CAM)
+        {
+            static bool start_status = false;
+            if(!start_status)
+            {
+                //init camrea lib
+                cam_new->initLib();
+                //open device SN号
+                cam_new->openDevice("KE0200060393");
+                //Attention:   (Width-64)%2=0; (Height-64)%2=0; X%16=0; Y%2=0;
+                int64_t width = 1280;
+                int64_t height = 1024;
+                int64_t OffsetX = 0;
+                int64_t OffsetY = 0;
+                //   ROI             Width  Height        X       Y
+                cam_new->setRoiParam(width, height, OffsetX, OffsetY);
+                //   ExposureGain          autoExposure  autoGain  ExposureTime  AutoExposureMin  AutoExposureMax  Gain(<=16)  AutoGainMin  AutoGainMax  GrayValue
+                cam_new->setExposureGainParam(false, false, 5000, 1000, 3000, 3, 5, 16, 127);
+                //   WhiteBalance             Applied?       light source type
+                cam_new->setWhiteBalanceParam(false, GX_AWB_LAMP_HOUSE_ADAPTIVE);
+                //   Acquisition Start!
+                cam_new->acquisitionStart(&frame_);
+                start_status = true;
+            }
 
-#ifdef GxCamera
-        //init camrea lib
-        cam_new->initLib();
-        //   open device      SN号
-        cam_new->openDevice("KE0200060396");
-        //Attention:   (Width-64)%2=0; (Height-64)%2=0; X%16=0; Y%2=0;
-        int64_t width = 1280;
-        int64_t height = 1024;
-        int64_t OffsetX = 0;
-        int64_t OffsetY = 0;
-        //   ROI             Width  Height        X       Y
-        cam_new->setRoiParam(width, height, OffsetX, OffsetY);
-        //   ExposureGain          autoExposure  autoGain  ExposureTime  AutoExposureMin  AutoExposureMax  Gain(<=16)  AutoGainMin  AutoGainMax  GrayValue
-        cam_new->setExposureGainParam( false, false, 5000, 1000, 3000, 3, 5, 16, 127);
-        //   WhiteBalance             Applied?       light source type
-        cam_new->setWhiteBalanceParam(    false,    GX_AWB_LAMP_HOUSE_ADAPTIVE);
-        //   Acquisition Start!
-        cam_new->acquisitionStart(&frame_);
-#endif
+            //get image
+            cam_new->ProcGetImage((void *)(cam_new->getparam()));
 
-#ifdef PICTURE
-        Mat temp = cam_->getFrame();
-        mutex_pic_.lock();
-        frame_.mat = temp.mat.clone();
-        mutex_pic_.unlock();
-        mutex_pic2_.lock();
-        frame2_.mat = frame_.mat.clone();
-        mutex_pic2_.unlock();
-
-        mutex_pic_.lock();
-        frame_ = val_out;
-        mutex_pic_.unlock();
-        mutex_pic2_.lock();
-        frame2_ = frame_;
-        mutex_pic2_.unlock();
-#endif
+            //cam_new->acquisitionEnd();
+        }
+        else if (type_ == VIDEO)
+        {
+            Mat temp = cam_->getFrame();
+            {
+                std::unique_lock<std::mutex> mutex_(mutex_pic_);
+                condition_pic_.wait(mutex_, []()
+                                    { return is_pic_getable; });
+                frame_ = temp;
+            }
+        }
+         //counter_.countEnd();
+         //std::cout << counter_.getTimeMs() << std::endl;
     }
     /**
      * @brief 返回图片信息，相机和非相机两种情况
-     * @return 图片信息
+     * @return 图片信息(灯条识别)
      */
     Mat cameraThread::getFrame()
     {
         Mat temp1;
-        mutex_pic_.lock();
-        temp1.mat = frame_.mat.clone();
-        temp1.time = frame_.time;
-        mutex_pic_.unlock();
+        {
+            std::unique_lock<std::mutex> mutex_(mutex_pic_);
+            condition_pic_.wait(mutex_, []()
+                                { return is_pic_getable; });
+            temp1.mat = frame_.mat.clone();
+            temp1.time = frame_.time;
+        }
         return temp1;
     }
-
-    Mat cameraThread::getFrame2()
-    {
-        Mat temp2;
-        mutex_pic2_.lock();
-        temp2.mat = frame2_.mat.clone();
-        temp2.time = frame2_.time;
-        mutex_pic2_.unlock();
-        return temp2;
-    }
+    //装甲板ID识别图片
+    // Mat cameraThread::getFrame2()
+    // {
+    //     Mat temp2;
+    //     {
+    //         std::unique_lock<std::mutex> mutex_(mutex_pic2_);
+    //         temp2.mat = frame2_.mat.clone();
+    //         temp2.time = frame2_.time;
+    //     }
+    //     return temp2;
+    // }
 }

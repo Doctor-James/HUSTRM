@@ -24,30 +24,14 @@
 #include "eigen3/Eigen/Dense"
 #include <opencv2/core/eigen.hpp>
 #include "transform.h"
-#include "table.h"
 #include "../../thread/inc/serialPortWriteThread.h"
 #include "../../thread/inc/serialPortReadThread.h"
 #include <lcm/lcm-cpp.hpp>
 
-#define BIAS_PITCH 0
-#define BIAS_YAW 0.2
-#define KF_REBOOT_THRESH 0.5
-#define KF_STATE_X KF_.statePost.at<float>(0)
-#define KF_STATE_Y KF_.statePost.at<float>(1)
-#define KF_STATE_VX KF_.statePost.at<float>(2)
-#define KF_STATE_VY KF_.statePost.at<float>(3)
+//#define debug
 
-cv::Point2d measurePoint;
-cv::Point2d statePoint;
-cv::Point2f pointBuff[6];
-float zBuff[9] = {0};
-float filterCOE[6]={0.0264077249,0.1405313627,0.3330609123,0.3330609123,0.1405313627,0.0264077249};
-float zfilterCOE[9]={0.01720767,0.0475656475,0.1221292039,0.19813310412,0.22992874818,0.19813310412,0.1221292039,0.0475656475,0.01720767};
 namespace ly
 {
-    extern const double table_angle[2937];
-    extern const double table_pitch[2937];
-    extern const double table_yaw[2937];
     transform::transform(serialPortReadThread *serialPortRead,serialPortWriteThread *serialPortWrite):
             serialPortRead_(serialPortRead),serialPortWrite_(serialPortWrite)
     {
@@ -63,20 +47,22 @@ namespace ly
         //shooter_ = Sophus::SE3(Eigen::Matrix3d::Identity(),shooter_trans);
         gimbal_to_cam_ = Sophus::SE3(Eigen::Matrix3d::Identity(),camera_trans);
 
-        armor_ = world_;
-        measurement_ = cv::Mat::zeros(4, 1, CV_32F);
-        KF_ = cv::KalmanFilter(4,4,0,CV_32F);
-        state_ = cv::Mat::zeros(4,1,CV_32F);
-        processNoise_ = cv::Mat::zeros(4,1,CV_32F);
+        armor_now = world_;
 
-        KF_.transitionMatrix = (cv::Mat_<float>(4, 4) <<
-                                                      1, 0, 1, 0,//A 状态转移矩阵
-                0, 1, 0, 1,
-                0, 0, 1, 0,
-                0, 0, 0, 1);
+
+        KF_ = cv::KalmanFilter(6,6,0,CV_32F);
+        measurement_ = cv::Mat::zeros(6, 1, CV_32F);
+        KF_.transitionMatrix = (cv::Mat_<float>(6, 6) <<
+                1.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
+                0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 1.0,0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 1.0        //A 状态转移矩阵
+                        );
         setIdentity(KF_.measurementMatrix);
-        setIdentity(KF_.processNoiseCov, cv::Scalar::all(1e-4));
-        setIdentity(KF_.measurementNoiseCov, cv::Scalar::all(1e-1));
+        setIdentity(KF_.processNoiseCov, cv::Scalar::all(0.001));
+        setIdentity(KF_.measurementNoiseCov, cv::Scalar::all(1));
         setIdentity(KF_.errorCovPost, cv::Scalar::all(1));
         randn(KF_.statePost, cv::Scalar::all(0), cv::Scalar::all(0.1));
         sendData_.pitch = 0;
@@ -86,7 +72,6 @@ namespace ly
 //        pthread_t tids;
 //        int ret = pthread_create(&tids, NULL, visual, (void*)this);
 //#endif
-
         DrawCurve_.ClearSaveData();
     }
     void transform::setimu(float pitch, float yaw, float roll)
@@ -99,108 +84,72 @@ namespace ly
     }
     void transform::setArmor2Cam(Sophus::SE3 armor2cam,receiveData receiveData_)
     {
-        float ppp = receiveData_.pitch/100.0f*3.14159f/180.0f;
-        float yyy = receiveData_.yaw/100.0f*3.14159f/180.0f;
-        setimu(ppp,yyy,0);
+        carPose_now.pitch = receiveData_.pitch/100.0f*3.14159f/180.0f;
+        carPose_now.yaw = receiveData_.yaw/100.0f*3.14159f/180.0f;
+        carPose_now.BeginToNowTime = receiveData_.Data_Time;
+
+
+        setimu(carPose_now.pitch,carPose_now.yaw,0);
         camera_ = gimbal_*gimbal_to_cam_;
-        armor_ = camera_*armor2cam;
+        armor_now = camera_*armor2cam;
+#ifndef debug
+        cv::Point3f armorPosition = cv::Point3f(armor_now.translation()[0],armor_now.translation()[1],armor_now.translation()[2]);
+        shootAngleTime_now = ballistic_equation(carPose_now.pitch,armorPosition);     //计算得击打所需时间
+
+        //std::cout<<"shootAngleTime_now.time: "<<shootAngleTime_now.time<<std::endl;
+        set_KF(armorPosition);
+        float shootTime = shootAngleTime_now.time/1000; //需要测试各种延时(s)
+
+        cv::Point3f Position_KF = cv::Point3f(KF_.statePost.at<float>(0),KF_.statePost.at<float>(1),KF_.statePost.at<float>(2));
+        cv::Point3f v_KF = cv::Point3f(KF_.statePost.at<float>(3),KF_.statePost.at<float>(4),KF_.statePost.at<float>(5));
+        cv::Point3f Position = Position_KF + v_KF*shootTime;
 
 
-        if (sqrt(pow(last_armor_.translation()[0] - armor_.translation()[0], 2) + pow(last_armor_.translation()[1] - armor_.translation()[1], 2) + pow(last_armor_.translation()[2] - armor_.translation()[2], 2)) > KF_REBOOT_THRESH)
-        {
-//std::cout<<"--------------------------KF Reboot------------"<<std::endl;
+        shootAngleTime_pre = ballistic_equation(carPose_now.pitch,Position);
 
-            KF_.statePre.at<float>(0) = armor_.translation()[0];
-            KF_.statePre.at<float>(1) = armor_.translation()[1];
-            KF_.statePre.at<float>(2) = 0;
-            KF_.statePre.at<float>(3) = 0;
-            KF_.statePost.at<float>(0) = armor_.translation()[0];
-            KF_.statePost.at<float>(1) = armor_.translation()[1];
-            KF_.statePost.at<float>(2) = 0;
-            KF_.statePost.at<float>(3) = 0;
-            setIdentity(KF_.errorCovPost, cv::Scalar::all(1));
-            setIdentity(KF_.errorCovPre, cv::Scalar::all(1));
-//std::cout<<"--------------------------KF Reboot------------"<<std::endl;
-        }
+        sendData_.pitch = shootAngleTime_pre.pitch*100;
+        sendData_.yaw = shootAngleTime_pre.yaw*100;
+        sendData_.distance = shootAngleTime_pre.distance*10;
 
+        //DrawCurve_.InsertData(armorPosition.x,Position.x,"real","predict");
 
-        last_armor_.translation()[0] = armor_.translation()[0];
-        last_armor_.translation()[1] = armor_.translation()[1];
-        last_armor_.translation()[2] = armor_.translation()[2];
+#endif
+#ifdef debug
+        cv::Point3f armorPosition = cv::Point3f(armor_now.translation()[0],armor_now.translation()[1],armor_now.translation()[2]);
 
-        KF_prediction = KF_.predict();
+        armorPosition.x = sin(i_debug);
+        i_debug+=0.1;
+        shootAngleTime_now.time = 15;
+        //std::cout<<"shootAngleTime_now.time: "<<shootAngleTime_now.time<<std::endl;
+        set_KF(armorPosition);
+        float shootTime = shootAngleTime_now.time/1000; //需要测试各种延时(s)
 
-/**************ADD FIR************************/
-        for(int i=0;i<5;i++)
-        {
-            pointBuff[i] = pointBuff[i+1];
-        }
-        for(int i=0;i<8;i++)
-        {
-            zBuff[i] = zBuff[i+1];
-        }
-        pointBuff[5] = cv::Point2f(armor_.translation()[0],armor_.translation()[1]);
-        zBuff[8] = armor_.translation()[2];
-//printf("znew   %f3\n",armor_.translation()[2]);
-        measurement_.at<float>(0)=0;
-        measurement_.at<float>(1)=0;
-        float z = 0;
+        cv::Point3f Position_KF = cv::Point3f(KF_.statePost.at<float>(0),KF_.statePost.at<float>(1),KF_.statePost.at<float>(2));
+        cv::Point3f v_KF = cv::Point3f(KF_.statePost.at<float>(3),KF_.statePost.at<float>(4),KF_.statePost.at<float>(5));
+        cv::Point3f Position = Position_KF + v_KF*shootTime;
 
-        for(int i=0;i<6;i++)
-        {
-            measurement_.at<float>(0) += filterCOE[i]*(pointBuff[i].x);
-            measurement_.at<float>(1) += filterCOE[i]*(pointBuff[i].y);
-        }
-        for(int i=0;i<9;i++)
-        {
-            z += zfilterCOE[i]*(zBuff[i]);
-
-        }
-
-/**********************************************/
+//        std::cout<<"v_pre: "<<v_pre.x<<std::endl;
+        shootAngleTime_pre = ballistic_equation(carPose_now.pitch,Position);
 
 
-        measurePoint.x = measurement_.at<float>(0)*100+512;
-        measurePoint.y = -measurement_.at<float>(1)*100+384;
-        //printf("measX	%f3	measY	%f3\n",armor_.translation()[0],	armor_.translation()[1]);
-        //printf("filterX	%f3	filterY	%f3\n",measurePoint.x,measurePoint.y);
-        //printf("%f3	%f3\n",measurePoint.x,measurePoint.y);
-        KF_.correct(measurement_);
+        //float pitch_temp = atan2(armor_now.translation()[2], sqrt(armor_now.translation()[0] * armor_now.translation()[0] + armor_now.translation()[1] * armor_now.translation()[1]))*180.0f/3.14159f;
+        //float yaw_temp  = -atan2(armor_now.translation()[0], armor_now.translation()[1])*180.0f/3.14159f;
 
-//        float distance = sqrt(pow(KF_prediction.at<float>(0),2) + pow(KF_prediction.at<float>(1),2) + pow(KF_prediction.at<float>(2),2));
-        float distance = sqrt(pow(armor_.translation()[0],2) + pow(armor_.translation()[1],2) + pow(armor_.translation()[2],2));
-        delta_t = distance / 18.5;
-        float predictX = KF_STATE_X ;//+ KF_STATE_VX*580*delta_t;
-        float predictY = KF_STATE_Y ;//+ KF_STATE_VY*580*delta_t;
+        sendData_.pitch = shootAngleTime_pre.pitch*100;
+        sendData_.yaw = shootAngleTime_pre.yaw*100;
+        sendData_.distance = shootAngleTime_pre.distance*10;
+        //DrawCurve_.InsertData(KF_.statePost.at<float>(3));
+        DrawCurve_.InsertData(armorPosition.x,Position.x,"real","predict");
+        std::cout<<"armorPosition.x: "<<armorPosition.x<<"Position.x: "<<Position.x<<std::endl;
 
-        distance = sqrt(pow(predictX,2) + pow(predictY,2));// + pow(armor_.translation()[2],2));
+        cv::waitKey(10);
 
-//       std::cout<<delta_t<<std::endl;
-
-        statePoint = cv::Point2d(KF_.statePost.at<float>(0) * 100 + 512, -KF_.statePost.at<float>(1) * 100 + 384);
-
-        float dy = distance;
-        float dz = 0.02646*dy*dy-0.03556*dy-0.0009681;
-        float lifted = z + dz;
-
-        pitch = atan2(lifted, distance)*180.0f/3.14159f+BIAS_PITCH;
-
-        yaw = -atan2(predictX, predictY)*180.0f/3.14159f+BIAS_YAW;
-
-        sendData_.pitch = pitch*100;
-        sendData_.yaw = yaw*100;
-        sendData_.distance = distance*10;
-        DrawCurve_.InsertData(armor_.translation()[0],KF_prediction.at<float>(0),"real","predict");
-        if(debug_ <5)
-        {
-            debug_++;
-        }
-        else
-        {
+#endif
+//        std::cout<<" shootAngleTime_now.yaw:"<<shootAngleTime_now.yaw<<" shootAngleTime_now.pitch:"<<shootAngleTime_now.pitch<<" shootAngleTime_now.time:"<<shootAngleTime_now.time<<" shootAngleTime_now.distance:"<<shootAngleTime_now.distance<<std::endl;
             if(sendData_.yaw>-100000&&sendData_.yaw<100000&&sendData_.pitch<100000&&sendData_.pitch>-100000)
             {
-/*	std::cout<<"send.y:"<<armor_.translation()[1]<<"send.pitch:"<<sendData_.pitch<<"send.distance:"<<sendData_.distance <<"send.z:"<<armor_.translation()[2]<<"send.x:"<<armor_.translation()[0]<<std::endl;
-*/
+//	std::cout<<"send.y:"<<armor_now.translation()[1]<<"send.pitch:"<<sendData_.pitch<<"send.distance:"<<sendData_.distance <<"send.z:"<<armor_now.translation()[2]<<"send.x:"<<armor_now.translation()[0]<<std::endl;
+
 
                 //if(coutCnt%2 == 0)
                 {
@@ -213,182 +162,186 @@ namespace ly
                 }
                 serialPortWrite_->setSendMsg(sendData_);
             }
-        }
 
     }
 
-
-
-
-
-    void transform::trans_BUFF(Sophus::SE3 armor2cam,receiveData receiveData_,double angle)
+    cv::Point3f transform::set_KF(cv::Point3f Position_now)
     {
-        //std::cout<<"11pitch:"<<receiveData_.pitch/100.0f<<std::endl;
-        float ppp = (receiveData_.pitch/100.0f)*3.14159f/180.0f;
-        float yyy = receiveData_.yaw/100.0f*3.14159f/180.0f;
-        //std::cout<<"receive_pitch"<<receiveData_.pitch/100.0f<<std::endl;
-        //std::cout<<"receive_yaw"<<receiveData_.yaw/100.0f<<std::endl;
-        setimu(0,0,0);
-        camera_ = gimbal_*gimbal_to_cam_;
-        armor_ = camera_*armor2cam;
-        //publish();
-        ballistic_equation(ppp);
-
-        static float pitch_ori = receiveData_.pitch;
-        static float yaw_ori = receiveData_.yaw;
-
-        setimu(ppp,yyy,0);
-        camera_ = gimbal_*gimbal_to_cam_;
-        armor_ = camera_*armor2cam;
-
-        distance = sqrt(pow(armor_.translation()[0],2) + pow(armor_.translation()[1],2) + pow(armor_.translation()[2],2));
-        //pitch = atan2(armor_.translation()[2], distance);
-        yaw = -atan2(armor_.translation()[0], armor_.translation()[1]);
-
-        float delta_angle_min = 100;
-        int delta_angle_minnum = 0;
-        for(int i=0;i<2937;i++)
+        if(!first_find_temp)  //@TODO 判断首次发现装甲
         {
-            if(abs(table_angle[i]-angle)<delta_angle_min)
-            {
-                delta_angle_min = abs(table_angle[i]-angle);
-                delta_angle_minnum = i;
-            }
-            if(delta_angle_min<0.3)
-            {
-                break;
-            }
-        }
-        sendData_.pitch = table_pitch[delta_angle_minnum];
-        sendData_.yaw = table_yaw[delta_angle_minnum];
-        cv::Mat shoot = cv::Mat::zeros(100,100,CV_8UC3);
-        cv::imshow("shooting",shoot);
-        char c =cv::waitKey(20);
-        if(c == 'q')
-        {
-            sendData_.shootStatus = 1;
+            //转移矩阵复位
+            KF_.transitionMatrix = (cv::Mat_<float>(6, 6) <<
+                    1.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+                    0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+                    0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
+                    0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 1.0,0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 1.0        //A 状态转移矩阵
+            );
+            first_find_temp = true;
+            is_nfirst_KF = false;
+            carPose_old = carPose_now;
+            Position_old = Position_now;
+            return (Position_now);
         }
         else
         {
-            sendData_.shootStatus =0;
+            if(!is_nfirst_KF)  //第二次发现装甲
+            {
+                First_Filter(Position_now);
+            }
+            else
+            {
+                Continuous_Filter(Position_now); //连续滤波
+            }
         }
-        if(sendData_.yaw>-100000&&sendData_.yaw<100000&&sendData_.pitch<100000&&sendData_.pitch>-100000)
-        {
-            serialPortWrite_->setSendMsg(sendData_);
-        }
-
 
     }
 
-    void transform::trans_BUFF_amend(double x,double y,double r,Sophus::SE3 armor2cam,double yaw,receiveData receiveData_)
+
+    void transform::First_Filter(cv::Point3f Position_now)
     {
-        //std::cout<<"11pitch:"<<receiveData_.pitch/100.0f<<std::endl;
-        float ppp = (receiveData_.pitch/100.0f)*3.14159f/180.0f;
-        float yyy = receiveData_.yaw/100.0f*3.14159f/180.0f;
-//        std::cout<<"receive_pitch"<<receiveData_.pitch/100.0f<<std::endl;
-//        std::cout<<"receive_yaw"<<receiveData_.yaw/100.0f<<std::endl;
-        setimu(ppp,yyy,0);
-        camera_ = gimbal_*gimbal_to_cam_;
-        armor_ = camera_*armor2cam;
+        if(carPose_old.BeginToNowTime == 0)
+        {
+            return;
+        }
 
+        float delta_t = carPose_now.BeginToNowTime-carPose_old.BeginToNowTime; //ms
+        if(delta_t == 0){
+            delta_t = 15;         //未收到数
+        }
+        is_nfirst_KF = true;
 
-        cv::Mat rotation_matrix = (cv::Mat_<double>(3, 3) <<
-                                                          armor_.rotation_matrix()(0,0), armor_.rotation_matrix()(0,1), armor_.rotation_matrix()(0,2),
-                armor_.rotation_matrix()(1,0), armor_.rotation_matrix()(1,1), armor_.rotation_matrix()(1,2),
-                armor_.rotation_matrix()(2,0), armor_.rotation_matrix()(2,1), armor_.rotation_matrix()(2,2)
+        //速度测量值(m/s)
+        float v_x = (Position_now.x - Position_old.x)/(delta_t/1000);    //(m/s)
+        float v_y = (Position_now.y - Position_old.y)/(delta_t/1000);
+        float v_z = (Position_now.z - Position_old.z)/(delta_t/1000);
+
+//        KF_.statePost.at<float>(0) = Position_now.x;
+//        KF_.statePost.at<float>(1) = Position_now.y;
+//        KF_.statePost.at<float>(2) = Position_now.z;
+//        KF_.statePost.at<float>(3) = v_x;
+//        KF_.statePost.at<float>(4) = v_y;
+//        KF_.statePost.at<float>(5) = v_z;
+
+        measurement_ = (cv::Mat_<float>(6, 1)<<
+        Position_now.x,Position_now.y,Position_now.z,v_x,v_y,v_z);
+        KF_.correct(measurement_);
+
+        //存放旧值
+        carPose_old = carPose_now;
+        Position_old = Position_now;
+        v_old.x = v_x;
+        v_old.y = v_y;
+        v_old.z = v_z;
+    }
+
+    void transform::Continuous_Filter(cv::Point3f Position_now)
+    {
+        if(carPose_old.BeginToNowTime == 0)
+        {
+            return;
+        }
+        float delta_t = carPose_now.BeginToNowTime-carPose_old.BeginToNowTime; //ms
+        //float delta_t = 8;
+        if(abs(delta_t) < 1e-5){
+            delta_t = 20;         //未收到数
+        }
+
+        //std::cout<<"delta_t: "<<delta_t<<std::endl;
+        KF_.transitionMatrix = (cv::Mat_<float>(6, 6) <<
+                1.0, 0.0, 0.0, delta_t/1000, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0, delta_t/1000, 0.0,
+                0.0, 0.0, 1.0, 0.0, 0.0, delta_t/1000,
+                0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 1.0,0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 1.0        //A 状态转移矩阵
         );
-        cv::Mat R;
-        cv::Rodrigues(rotation_matrix,R);
-        yaw = R.at<double>(1);
-        //std::cout<<"yaw"<<yaw<<std::endl;
-        //std::cout<<"send.y:"<<armor_.translation()[1] <<"send.z:"<<armor_.translation()[2]<<"send.x:"<<armor_.translation()[0]<<std::endl;
 
-        static int bias_y = 50;
-        static int bias_x = 50;
-        static int bias_z = 50;
+        KF_.predict();
 
-        cv::Mat buff_show =  cv::Mat::zeros(800,800,CV_8UC3);
-        float buff_f = 0.79f + (float)(bias_y-50)/100;
-        double temp_y = 1264*buff_f/sqrt(r);
-        double temp_x,temp_z;
-        temp_x = temp_y*(x-640)/1264  + (float)(bias_x-50)/100 + 0.13;
-        temp_z = temp_y*(-y+512)/1264 + (float)(bias_z-50)/100 - 0.07;
+        Position_pre.x = KF_.statePre.at<float>(0);
+        Position_pre.y = KF_.statePre.at<float>(1);
+        Position_pre.z = KF_.statePre.at<float>(2);
+        v_pre.x = KF_.statePre.at<float>(3);
+        v_pre.y = KF_.statePre.at<float>(4);
+        v_pre.z = KF_.statePre.at<float>(5);
+
+        //速度测量值(m/s)
+        float v_x = (Position_now.x - Position_old.x)/(delta_t/1000);
+        float v_y = (Position_now.y - Position_old.y)/(delta_t/1000);
+        float v_z = (Position_now.z - Position_old.z)/(delta_t/1000);
 
 
-        double V = 300.f/buff_f *(armor_.translation()[2] - temp_z);
-        double U = 300.f/buff_f *(armor_.translation()[0] - temp_x);
+        //DrawCurve_.InsertData(KF_.statePost.at<float>(3));
 
-        // draw circle
-//        cv::circle(buff_show,cv::Point(400,400),300,cv::Scalar(255,255,255));
-//        cv::circle(buff_show,cv::Point(400,400),10,cv::Scalar(255,255,255));
-//        cv::circle(buff_show,cv::Point(U+400,-V+400),10,cv::Scalar(255,255,255));
-//        cv::createTrackbar("r","buff",&bias_y,100);
-//        cv::createTrackbar("x","buff",&bias_x,100);
-//        cv::createTrackbar("z","buff",&bias_z,100);
-//        cv::imshow("buff",buff_show);
+        measurement_ = (cv::Mat_<float>(6, 1)<<
+                                             Position_now.x,Position_now.y,Position_now.z,v_x,v_y,v_z);
+        KF_.correct(measurement_);
+        //std::cout<<"v_x: "<<v_x<<" position："<<KF_.statePost.at<float>(0)<<std::endl;
 
-
-        //std::cout<<"shoot:"<<(int)sendData_.shootStatus<<std::endl;
-        sendData_.pitch = receiveData_.pitch;
-        sendData_.yaw = yaw*100*180.0f/3.14159f;
-        //std::cout<<"send.y:"<<receiveData_.pitch<<"send.p:"<<sendData_.pitch<<std::endl;
-//        serialPortWrite_->setSendMsg(sendData_);
-
-
+        //存放旧值
+        carPose_old = carPose_now;
+        Position_old = Position_now;
+        v_old.x = v_x;
+        v_old.y = v_y;
+        v_old.z = v_z;
     }
 
 
     // 根据物理方程来计算设定pitch和yaw
-    Eigen::Vector2f transform::ballistic_equation(float gim_pitch)
+    Angle_t transform::ballistic_equation(float gim_pitch,cv::Point3f armor_Position)
     {
-        Eigen::Vector2f result;
+        Angle_t shootAngleTime_;
         // 先计算yaw轴角度
-        yaw = atan(armor_.translation()[0] /armor_.translation()[1]);
+        shootAngleTime_.yaw = atan(armor_Position.x /armor_Position.y);
+        shootAngleTime_.distance =sqrt(armor_Position.x * armor_Position.x + armor_Position.y * armor_Position.y);
         // armor 的位置进行了一定的旋转
-        armor_.translation() << 0,sqrt(armor_.translation()[0] * armor_.translation()[0] + armor_.translation()[1] * armor_.translation()[1]), armor_.translation()[2];
+        armor_Position = cv::Point3f(0,sqrt(armor_Position.x * armor_Position.x + armor_Position.y * armor_Position.y), armor_Position.z);
         // 旋转到世界坐标系
-        armor_.translation() << 0,armor_.translation()[1]*cos(gim_pitch)-armor_.translation()[2]*sin(gim_pitch),armor_.translation()[1]*sin(gim_pitch)+armor_.translation()[2]*cos(gim_pitch);
-        //std::cout<<"armor[2] "<<armor_.translation()[2]<<"armor[1]"<<armor_.translation()[1]<<std::endl;
+        armor_Position = cv::Point3f(0,armor_Position.y*cos(gim_pitch)-armor_Position.z*sin(gim_pitch),armor_Position.y*sin(gim_pitch)+armor_Position.z*cos(gim_pitch));
+        //std::cout<<"armor[2] "<<armor_Position.z<<"armor[1]"<<armor_Position.y<<std::endl;
         //std::cout<<"receive_pitch"<<gim_pitch/3.1415926*180<<std::endl;
         // 计算pitch轴的初始角度
-        pitch = atan2(armor_.translation()[2], armor_.translation()[1]);
-        //std::cout<<"armor[2] "<<armor_.translation()[2]<<"armor[1]"<<armor_.translation()[1]<<std::endl;
+        shootAngleTime_.pitch = atan2(armor_Position.z, armor_Position.y);
+        //std::cout<<"armor[2] "<<armor_Position.z<<"armor[1]"<<armor_Position.y<<std::endl;
         //std::cout<<"pitch"<<pitch/3.1415926*180<<std::endl;
         float err = 100;
-        float delta=0;
         // 迭代计算pitch轴角度
         for(int i = 0;i < 5;i ++)
         {// 多次迭代计算得到目标位置
             // 前向弹道方程
-            auto target = forward_ballistic_equation(pitch,armor_.translation()[1]);
-            err = armor_.translation()[2] - target;
+            auto target = forward_ballistic_equation(shootAngleTime_.pitch,armor_Position.y);
+            err = armor_Position.z - target;
             if(fabs(err) < 0.001)
             {
                 break;
             }
             // 计算导数
-            float J = derivation(pitch,armor_.translation()[1]);
+            float J = derivation( shootAngleTime_.pitch,armor_Position.y);
             float d_theta = - err / J;
             // 更新设定角度
-            pitch += d_theta;
-            delta+=d_theta;
+            shootAngleTime_.pitch += d_theta;
         }
-        result << pitch/3.14159*180,yaw/3.14159*180;
-//        td::cout<<"ss"<<delta<<std::endl;
-        return result;
+        shootAngleTime_.time = shootAngleTime_.distance/(carPose_now.ShootSpeed*cos(shootAngleTime_.pitch))*1000;
+        shootAngleTime_.pitch = shootAngleTime_.pitch/3.1415926*180.0;
+        shootAngleTime_.yaw = shootAngleTime_.yaw/3.1415926*180.0f;
+
+
+        return shootAngleTime_;
     }
 
 // 高中物理公式
     float transform::forward_ballistic_equation(float angle,float x)
     {
-        float time = x / (m_set_speed * cos(angle));
-        return m_set_speed * sin(angle) * time - 0.5 * 9.8 * time * time;
+        float time = x / (carPose_now.ShootSpeed * cos(angle));
+        return carPose_now.ShootSpeed * sin(angle) * time - 0.5 * 9.8 * time * time;
     }
 
 
     float transform::derivation(float angle,float x)
     {
-        return -x / pow(cos(angle),2) +1.5*x*x/(m_set_speed*m_set_speed)*1/pow(cos(angle),3);
+        return -x / pow(cos(angle),2) +1.5*x*x/(carPose_now.ShootSpeed*carPose_now.ShootSpeed)*1/pow(cos(angle),3);
     }
 
 #ifdef DEBUG_TRANS
@@ -422,7 +375,7 @@ namespace ly
                 _this->glDrawColouredAxis(_this->gimbal_,0.5);
                 //_this->glDrawColouredAxis(_this->imu_,0.5);
                 //_this->glDrawColouredAxis(_this->shooter_,0.08);
-                _this->glDrawColouredCuboid(_this->armor_,0.08);
+                _this->glDrawColouredCuboid(_this->armor_now,0.08);
                 // Swap frames and Process Events
                 pangolin::FinishFrame();
                 usleep(20000);//50hz

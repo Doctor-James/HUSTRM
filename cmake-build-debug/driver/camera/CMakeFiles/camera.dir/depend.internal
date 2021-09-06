@@ -15,6 +15,7 @@ driver/camera/CMakeFiles/camera.dir/src/GxCamera.cpp.o
  ../driver/camera/inc/DxImageProc.h
  ../driver/camera/inc/GxCamera.h
  ../driver/camera/inc/GxIAPI.h
+ ../thread/inc/thread.h
  ../tool/inc/tool_Drawcurve.h
  ../tool/inc/tool_config.h
  ../tool/inc/tool_time.h

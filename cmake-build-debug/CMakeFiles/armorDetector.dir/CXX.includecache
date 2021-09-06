@@ -90,14 +90,6 @@ iostream
 tools.h
 ../armor/inc/tools.h
 
-../driver/camera/inc/DAHEN_camera.h
-camera.h
-../driver/camera/inc/camera.h
-DxImageProc.h
-../driver/camera/inc/DxImageProc.h
-GxIAPI.h
-../driver/camera/inc/GxIAPI.h
-
 ../driver/camera/inc/DxImageProc.h
 stdafx.h
 ../driver/camera/inc/stdafx.h
@@ -211,6 +203,8 @@ serialPortWriteThread.h
 ../solvePNP/inc/serialPortWriteThread.h
 algorithm
 -
+math.h
+-
 
 ../thread/inc/armorThread.h
 solvePNP.h
@@ -233,8 +227,6 @@ thread
 ../thread/inc/cameraThread.h
 camera.h
 ../thread/inc/camera.h
-DAHEN_camera.h
-../thread/inc/DAHEN_camera.h
 mutex
 -
 thread
@@ -306,6 +298,8 @@ thread.h
 mutex
 -
 thread
+-
+condition_variable
 -
 
 ../tool/inc/tool_Drawcurve.h

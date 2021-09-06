@@ -64,6 +64,8 @@ namespace ly
         score *area_Ceo_;
         score *distance_Ceo_;
         lightBar_param config_;
+        //HSV
+        int iLowH , iLowS , iLowV , iHighH , iHighS , iHighV ;
         std::vector<cv::RotatedRect> lightBars_;
         std::priority_queue<lightBarNode> temp_LBQ_;
         int thresh_;

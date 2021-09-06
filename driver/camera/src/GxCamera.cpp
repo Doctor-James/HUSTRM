@@ -1,3 +1,4 @@
+
 //--------------------------------------------------------------------------------
 /**
 \file     GxCamera.cpp
@@ -11,28 +12,28 @@
 
 #include <stdlib.h>
 #include "GxCamera.h"
-
-extern pthread_mutex_t Globalmutex; // threads conflict due to image-updating
-extern pthread_cond_t GlobalCondCV; // threads conflict due to image-updating
-extern bool imageReadable;          // threads conflict due to image-updating
-//cv::Mat src;                     // Transfering buffer
-namespace ly {
-    GxCamera::GxCamera() {
-        g_hDevice = NULL;                     ///< Device handle
-        g_pDeviceSN = "KE0200060394";
-        g_bColorFilter = false;                        ///< Color filter support flag
-        g_i64ColorFilter = GX_COLOR_FILTER_NONE;    ///< Color filter of device
-        g_bAcquisitionFlag = true;                    ///< Thread running flag
-        g_nAcquisitonThreadID = 0;                ///< Thread ID of Acquisition thread
-        g_nPayloadSize = 0;                         ///< Payload size
+#include "../../thread/inc/thread.h"
+namespace ly
+{
+    struct timeval start;
+    GxCamera::GxCamera()
+    {
+        g_hDevice = NULL; ///< Device handle
+        g_pDeviceSN = "KE0200060396";
+        g_bColorFilter = false;                  ///< Color filter support flag
+        g_i64ColorFilter = GX_COLOR_FILTER_NONE; ///< Color filter of device
+        g_bAcquisitionFlag = true;               ///< Thread running flag
+        g_nAcquisitonThreadID = 0;               ///< Thread ID of Acquisition thread
+        g_nPayloadSize = 0;                      ///< Payload size 有效负载
     }
 
-    GxCamera::~GxCamera() {
-
+    GxCamera::~GxCamera()
+    {
     }
 
-/// Initialize libary
-    GX_STATUS GxCamera::initLib() {
+    /// Initialize libary
+    GX_STATUS GxCamera::initLib()
+    {
         GX_STATUS status = GX_STATUS_SUCCESS;
         printf("\n");
         printf("-------------------------------------------------------------\n");
@@ -44,30 +45,33 @@ namespace ly {
         printf("\n\n");
         //Initialize libary
         status = GXInitLib();
+        if (status != GX_STATUS_SUCCESS)
+            return 0;
         GX_VERIFY(status);
     }
 
-
-/// Open device and display device information
-    GX_STATUS GxCamera::openDevice(const char *CameraSN) {
+    /// Open device and display device information
+    GX_STATUS GxCamera::openDevice(const char *CameraSN)
+    {
         //return GX_STATUS_SUCCESS;
         GX_STATUS status = GX_STATUS_SUCCESS;
         uint32_t ui32DeviceNum = 0;
-        g_pDeviceSN = const_cast<char*> (CameraSN);
+        g_pDeviceSN = const_cast<char *>(CameraSN);
 
         //Get device enumerated number
         status = GXUpdateDeviceList(&ui32DeviceNum, 1000);
         GX_VERIFY_EXIT(status);
 
         //If no device found, app exit<char*>(const char*);
-        if (ui32DeviceNum <= 0) {
+        if (ui32DeviceNum <= 0)
+        {
             printf("<No device found>\n");
             GXCloseLib();
             exit(status);
         }
 
         //Init OpenParam , Open device in exclusive mode by SN
-//        char g_pDeviceSN[] = "KE0200060397";
+        //        char g_pDeviceSN[] = "KE0200060397";
         GX_OPEN_PARAM stOpenParam;
         stOpenParam.accessMode = GX_ACCESS_EXCLUSIVE;
         stOpenParam.openMode = GX_OPEN_SN;
@@ -76,7 +80,6 @@ namespace ly {
         //Open device
         status = GXOpenDevice(&stOpenParam, &g_hDevice);
         GX_VERIFY_EXIT(status);
-
 
         //Get Device Info
         printf("***********************************************\n");
@@ -90,7 +93,8 @@ namespace ly {
         char *pszVendorName = new char[nSize];
         //Get Vendor name
         status = GXGetString(g_hDevice, GX_STRING_DEVICE_VENDOR_NAME, pszVendorName, &nSize);
-        if (status != GX_STATUS_SUCCESS) {
+        if (status != GX_STATUS_SUCCESS)
+        {
             delete[] pszVendorName;
             pszVendorName = NULL;
             GX_VERIFY_EXIT(status);
@@ -108,7 +112,8 @@ namespace ly {
         char *pszModelName = new char[nSize];
         //Get Model name
         status = GXGetString(g_hDevice, GX_STRING_DEVICE_MODEL_NAME, pszModelName, &nSize);
-        if (status != GX_STATUS_SUCCESS) {
+        if (status != GX_STATUS_SUCCESS)
+        {
             delete[] pszModelName;
             pszModelName = NULL;
             GX_VERIFY_EXIT(status);
@@ -126,7 +131,8 @@ namespace ly {
         char *pszSerialNumber = new char[nSize];
         //Get Serial Number
         status = GXGetString(g_hDevice, GX_STRING_DEVICE_SERIAL_NUMBER, pszSerialNumber, &nSize);
-        if (status != GX_STATUS_SUCCESS) {
+        if (status != GX_STATUS_SUCCESS)
+        {
             delete[] pszSerialNumber;
             pszSerialNumber = NULL;
             GX_VERIFY_EXIT(status);
@@ -142,7 +148,8 @@ namespace ly {
         char *pszDeviceVersion = new char[nSize];
         //Get Device Version
         status = GXGetString(g_hDevice, GX_STRING_DEVICE_VERSION, pszDeviceVersion, &nSize);
-        if (status != GX_STATUS_SUCCESS) {
+        if (status != GX_STATUS_SUCCESS)
+        {
             delete[] pszDeviceVersion;
             pszDeviceVersion = NULL;
             GX_VERIFY_EXIT(status);
@@ -166,26 +173,29 @@ namespace ly {
         GX_VERIFY_EXIT(status);
 
         //This app only support color cameras
-        if (!g_bColorFilter) {
+        if (!g_bColorFilter)
+        {
             printf("<This app only support color cameras! App Exit!>\n");
             GXCloseDevice(g_hDevice);
             g_hDevice = NULL;
             GXCloseLib();
             exit(0);
-        } else {
+        }
+        else
+        {
             status = GXGetEnum(g_hDevice, GX_ENUM_PIXEL_COLOR_FILTER, &g_i64ColorFilter);
             GX_VERIFY_EXIT(status);
         }
         return GX_STATUS_SUCCESS;
     }
 
-
-/// For client
-/// Set camera exposure and gain params
+    /// For client
+    /// Set camera exposure and gain params
     void
     GxCamera::setExposureGainParam(bool AutoExposure, bool AutoGain, double ExposureTime, double AutoExposureTimeMin,
                                    double AutoExposureTimeMax, double Gain, double AutoGainMin, double AutoGainMax,
-                                   int64_t GrayValue) {
+                                   int64_t GrayValue)
+    {
         exposure_gain.m_bAutoExposure = AutoExposure;
         exposure_gain.m_bAutoGain = AutoGain;
         exposure_gain.m_dExposureTime = ExposureTime;
@@ -197,19 +207,23 @@ namespace ly {
         exposure_gain.m_i64GrayValue = GrayValue;
     }
 
-/// Set camera exposure and gain
-    GX_STATUS GxCamera::setExposureGain() {
+    /// Set camera exposure and gain
+    GX_STATUS GxCamera::setExposureGain()
+    {
         GX_STATUS status;
 
         // Set Exposure
-        if (exposure_gain.m_bAutoExposure) {
+        if (exposure_gain.m_bAutoExposure)
+        {
             status = GXSetEnum(g_hDevice, GX_ENUM_EXPOSURE_AUTO, GX_EXPOSURE_AUTO_CONTINUOUS);
             GX_VERIFY(status);
             status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_EXPOSURE_TIME_MAX, exposure_gain.m_dAutoExposureTimeMax);
             GX_VERIFY(status);
             status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_EXPOSURE_TIME_MIN, exposure_gain.m_dAutoExposureTimeMin);
             GX_VERIFY(status);
-        } else {
+        }
+        else
+        {
             status = GXSetEnum(g_hDevice, GX_ENUM_EXPOSURE_MODE, GX_EXPOSURE_MODE_TIMED);
             GX_VERIFY(status);
             status = GXSetEnum(g_hDevice, GX_ENUM_EXPOSURE_AUTO, GX_EXPOSURE_AUTO_OFF);
@@ -219,14 +233,17 @@ namespace ly {
         }
 
         // Set Gain
-        if (exposure_gain.m_bAutoGain) {
+        if (exposure_gain.m_bAutoGain)
+        {
             status = GXSetEnum(g_hDevice, GX_ENUM_GAIN_AUTO, GX_GAIN_AUTO_CONTINUOUS);
             GX_VERIFY(status);
             status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_GAIN_MAX, exposure_gain.m_dAutoGainMax);
             GX_VERIFY(status);
             status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_GAIN_MIN, exposure_gain.m_dAutoGainMin);
             GX_VERIFY(status);
-        } else {
+        }
+        else
+        {
             status = GXSetEnum(g_hDevice, GX_ENUM_GAIN_AUTO, GX_GAIN_AUTO_OFF);
             GX_VERIFY(status);
             status = GXSetEnum(g_hDevice, GX_ENUM_GAIN_SELECTOR, GX_GAIN_SELECTOR_ALL);
@@ -242,17 +259,19 @@ namespace ly {
         return GX_STATUS_SUCCESS;
     }
 
-/// For client
-/// Set camera roi params
-    void GxCamera::setRoiParam(int64_t Width, int64_t Height, int64_t OffsetX, int64_t OffsetY) {
+    /// For client
+    /// Set camera roi params
+    void GxCamera::setRoiParam(int64_t Width, int64_t Height, int64_t OffsetX, int64_t OffsetY)
+    {
         roi.m_i64Width = Width;
         roi.m_i64Height = Height;
         roi.m_i64OffsetX = OffsetX;
         roi.m_i64OffsetY = OffsetY;
     }
 
-/// Set camera roi
-    GX_STATUS GxCamera::setRoi() {
+    /// Set camera roi
+    GX_STATUS GxCamera::setRoi()
+    {
         GX_STATUS status = GX_STATUS_SUCCESS;
         //设 置 一 个 offset 偏 移 为 (X,Y) ,WidthXHeight 尺 寸 的 区 域
         status = GXSetInt(g_hDevice, GX_INT_WIDTH, 64);
@@ -269,10 +288,10 @@ namespace ly {
         GX_VERIFY(status);
     }
 
-
-/// For client
-/// Set camera white balance params
-    void GxCamera::setWhiteBalanceParam(bool WhiteBalanceOn, GX_AWB_LAMP_HOUSE_ENTRY lightSource) {
+    /// For client
+    /// Set camera white balance params
+    void GxCamera::setWhiteBalanceParam(bool WhiteBalanceOn, GX_AWB_LAMP_HOUSE_ENTRY lightSource)
+    {
         //自动白平衡光照环境
         // GX_AWB_LAMP_HOUSE_ADAPTIVE 自适应
         // GX_AWB_LAMP_HOUSE_FLUORESCENCE 荧光灯
@@ -285,13 +304,15 @@ namespace ly {
         white_balance.lightSource = lightSource;
     }
 
-/// Set camera WhiteBalance
-    GX_STATUS GxCamera::setWhiteBalance() {
+    /// Set camera WhiteBalance
+    GX_STATUS GxCamera::setWhiteBalance()
+    {
 
         //选择白平衡通道
         GX_STATUS status;
 
-        if (white_balance.m_bWhiteBalance) {
+        if (white_balance.m_bWhiteBalance)
+        {
             status = GXSetEnum(g_hDevice, GX_ENUM_BALANCE_RATIO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_RED);
             //status = GXSetEnum(g_hDevice, GX_ENUM_BALANCE_RATIO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_GREEN);
             //status = GXSetEnum(g_hDevice, GX_ENUM_BALANCE_RAT IO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_BLUE);
@@ -310,7 +331,9 @@ namespace ly {
             //设置连续自动白平衡
             status = GXSetEnum(g_hDevice, GX_ENUM_BALANCE_WHITE_AUTO, GX_BALANCE_WHITE_AUTO_CONTINUOUS);
             GX_VERIFY(status);
-        } else {
+        }
+        else
+        {
             status = GXSetEnum(g_hDevice, GX_ENUM_BALANCE_WHITE_AUTO, GX_BALANCE_WHITE_AUTO_OFF);
             GX_VERIFY(status);
         }
@@ -318,9 +341,9 @@ namespace ly {
         return GX_STATUS_SUCCESS;
     }
 
-
-/// Main function to run the whole program
-    GX_STATUS GxCamera::acquisitionStart(Mat* image) {
+    /// Main function to run the whole program
+    GX_STATUS GxCamera::acquisitionStart(Mat *image)
+    {
 
         //////////////////////////////////////////SOME SETTINGS/////////////////////////////////////////////
         threadParam.m_hDevice = g_hDevice;
@@ -330,6 +353,8 @@ namespace ly {
         GX_STATUS emStatus;
         //Set Roi
         emStatus = setRoi();
+        if (emStatus != GX_STATUS_SUCCESS)
+            std::cout << "fail" << std::endl;
         GX_VERIFY_EXIT(emStatus);
         //Set Exposure and Gain
         emStatus = setExposureGain();
@@ -337,8 +362,6 @@ namespace ly {
         //Set WhiteBalance
         emStatus = setWhiteBalance();
         GX_VERIFY_EXIT(emStatus);
-
-
 
         //Set acquisition mode
         emStatus = GXSetEnum(g_hDevice, GX_ENUM_ACQUISITION_MODE, GX_ACQ_MODE_CONTINUOUS);
@@ -357,7 +380,8 @@ namespace ly {
         emStatus = GXIsImplemented(g_hDevice, GX_DS_INT_STREAM_TRANSFER_SIZE, &bStreamTransferSize);
         GX_VERIFY_EXIT(emStatus);
 
-        if (bStreamTransferSize) {
+        if (bStreamTransferSize)
+        {
             //Set size of data transfer block
             emStatus = GXSetInt(g_hDevice, GX_DS_INT_STREAM_TRANSFER_SIZE, ACQ_TRANSFER_SIZE);
             GX_VERIFY_EXIT(emStatus);
@@ -367,7 +391,8 @@ namespace ly {
         emStatus = GXIsImplemented(g_hDevice, GX_DS_INT_STREAM_TRANSFER_NUMBER_URB, &bStreamTransferNumberUrb);
         GX_VERIFY_EXIT(emStatus);
 
-        if (bStreamTransferNumberUrb) {
+        if (bStreamTransferNumberUrb)
+        {
             //Set qty. of data transfer block
             emStatus = GXSetInt(g_hDevice, GX_DS_INT_STREAM_TRANSFER_NUMBER_URB, ACQ_TRANSFER_NUMBER_URB);
             GX_VERIFY_EXIT(emStatus);
@@ -375,33 +400,42 @@ namespace ly {
 
         //Device start acquisition
         emStatus = GXStreamOn(g_hDevice);
-        if (emStatus != GX_STATUS_SUCCESS) {
+        if (emStatus != GX_STATUS_SUCCESS)
+        {
             GX_VERIFY_EXIT(emStatus);
         }
 
         //////////////////////////////////////////CREATE THREAD/////////////////////////////////////////////
 
         //Start acquisition thread, if thread create failed, exit this app
-        int nRet = pthread_create(&g_nAcquisitonThreadID, NULL, ProcGetImage, (void *) &threadParam);
-        if (nRet != 0) {
-            GXCloseDevice(g_hDevice);
-            g_hDevice = NULL;
-            GXCloseLib();
+        // int nRet = pthread_create(&g_nAcquisitonThreadID, NULL, ProcGetImage, (void *)&threadParam);
+        // if (nRet != 0)
+        // {
+        //     GXCloseDevice(g_hDevice);
+        //     g_hDevice = NULL;
+        //     GXCloseLib();
 
-            printf("<Failed to create the acquisition thread, App Exit!>\n");
-            exit(nRet);
-        }
+        //     printf("<Failed to create the acquisition thread, App Exit!>\n");
+        //     exit(nRet);
+        // }
 
         //Main loop
-        bool bRun = true;
-        while (bRun == true) {
-            printf("????????????????loop is running???????????????????????\n");
-            char chKey = getchar();
-            if (chKey == 'x' || chKey == 'X') {
-                break;
-            }
-        }
+        // bool bRun = true;
+        // while (bRun == true)
+        // {
+        //     printf("????????????????loop is running???????????????????????\n");
+        //     char chKey = getchar();
+        //     if (chKey == 'x' || chKey == 'X')
+        //     {
+        //         break;
+        //     }
+        // }
 
+        return 0;
+    }
+    GX_STATUS GxCamera::acquisitionEnd()
+    {
+        GX_STATUS emStatus;
         //////////////////////////////////////////STOP THREAD/////////////////////////////////////////////
 
         //Stop Acquisition thread
@@ -410,13 +444,15 @@ namespace ly {
 
         //Device stop acquisition
         emStatus = GXStreamOff(g_hDevice);
-        if (emStatus != GX_STATUS_SUCCESS) {
+        if (emStatus != GX_STATUS_SUCCESS)
+        {
             GX_VERIFY_EXIT(emStatus);
         }
 
         //Close device
         emStatus = GXCloseDevice(g_hDevice);
-        if (emStatus != GX_STATUS_SUCCESS) {
+        if (emStatus != GX_STATUS_SUCCESS)
+        {
             GetErrorString(emStatus);
             g_hDevice = NULL;
             GXCloseLib();
@@ -425,49 +461,55 @@ namespace ly {
 
         //Release libary
         emStatus = GXCloseLib();
-        if (emStatus != GX_STATUS_SUCCESS) {
+        if (emStatus != GX_STATUS_SUCCESS)
+        {
             GetErrorString(emStatus);
             exit(0);
         }
 
         printf("<App exit!>\n");
-//        system("pause");
-        return 0;
+        //        system("pause");
     }
-
-
-//-------------------------------------------------
-/**
+    //-------------------------------------------------
+    /**
 \brief Acquisition thread function
 \param pParam       thread param, used to transfer the ptr of Mat
 \return void*
 */
-//-------------------------------------------------
-    void *ProcGetImage(void *pAcquisitionThread) {
-        time counter_;
+    //-------------------------------------------------
+    void *GxCamera::ProcGetImage(void *pAcquisitionThread)
+    {
+        //time counter_;
         GX_STATUS emStatus = GX_STATUS_SUCCESS;
         //Thread running flag setup
-        AcquisitionThread *threadParam = (AcquisitionThread *) pAcquisitionThread;
+        AcquisitionThread *threadParam = (AcquisitionThread *)pAcquisitionThread;
         PGX_FRAME_BUFFER pFrameBuffer = NULL;
         uint32_t ui32FrameCount = 0;
 
-        while (*(threadParam->g_AcquisitionFlag)) {
+        if(*(threadParam->g_AcquisitionFlag))
+        {
+            //counter_.countBegin();
             // Get a frame from Queue
-            time count1;
-            count1.countBegin();
             emStatus = GXDQBuf(threadParam->m_hDevice, &pFrameBuffer, 1000);
-            if (emStatus != GX_STATUS_SUCCESS) {
-                if (emStatus == GX_STATUS_TIMEOUT) {
-                    continue;
-                } else {
+            if (emStatus != GX_STATUS_SUCCESS)
+            {
+                if (emStatus == GX_STATUS_TIMEOUT)
+                {
+                    return 0;
+                }
+                else
+                {
                     GetErrorString(emStatus);
-                    break;
+                    return 0;
                 }
             }
 
-            if (pFrameBuffer->nStatus != GX_FRAME_STATUS_SUCCESS) {
+            if (pFrameBuffer->nStatus != GX_FRAME_STATUS_SUCCESS)
+            {
                 printf("<Abnormal Acquisition: Exception code: %d>\n", pFrameBuffer->nStatus);
-            } else {
+            }
+            else
+            {
                 cv::Mat src;
                 src.create(pFrameBuffer->nHeight, pFrameBuffer->nWidth, CV_8UC3);
 
@@ -476,83 +518,92 @@ namespace ly {
 
                 //Convert raw8(bayer) image into BGR24 image
                 VxInt32 emDXStatus = DX_OK;
-                emDXStatus = DxRaw8toRGB24((unsigned char *) pFrameBuffer->pImgBuf, pBGRBuf, pFrameBuffer->nWidth,
+                emDXStatus = DxRaw8toRGB24((unsigned char *)pFrameBuffer->pImgBuf, pBGRBuf, pFrameBuffer->nWidth,
                                            pFrameBuffer->nHeight,
                                            RAW2RGB_NEIGHBOUR, DX_PIXEL_COLOR_FILTER(BAYERBG), false);
-                if (emDXStatus != DX_OK) {
+                if (emDXStatus != DX_OK)
+                {
                     printf("DxRaw8toRGB24 Failed, Error Code: %d\n", emDXStatus);
                     delete[] pBGRBuf;
                     pBGRBuf = NULL;
-                    continue;
-                } else {
+                    return 0;
+                }
+                else
+                {
                     memcpy(src.data, pBGRBuf, pFrameBuffer->nHeight * pFrameBuffer->nWidth * 3);
-
                     // producer 获取Mat图像接口
-                    //pthread_mutex_lock(&Globalmutex);
-                    src.copyTo(threadParam->m_pImage->mat);
-                    threadParam->m_pImage->time = clock();
-//                imageReadable = true;
-                    //pthread_cond_signal(&GlobalCondCV);
-                    //pthread_mutex_unlock(&Globalmutex);
-
+                    {
+                        std::unique_lock<std::mutex> mutex_(mutex_pic_);
+                        is_pic_getable = false;
+                        src.copyTo(threadParam->m_pImage->mat);
+                        gettimeofday(&start, NULL);
+                        threadParam->m_pImage->time = (double) (1000000 * (start.tv_sec) + (start.tv_usec)) / 1000;
+                    }
+                    is_pic_getable = true;
+                    condition_pic_.notify_one();
                     delete[] pBGRBuf;
                     pBGRBuf = NULL;
                 }
-                //输出采集到的图像信息
-                //printf("<Successful acquisition: FrameCount: %u Width: %d Height: %d FrameID: %llu>\n",
-                //        ui32FrameCount++, pFrameBuffer->nWidth, pFrameBuffer->nHeight, pFrameBuffer->nFrameID);
-
                 emStatus = GXQBuf(threadParam->m_hDevice, pFrameBuffer);
-                if (emStatus != GX_STATUS_SUCCESS) {
+                if (emStatus != GX_STATUS_SUCCESS)
+                {
                     GetErrorString(emStatus);
-                    break;
+                    return 0;
                 }
-                count1.countEnd();
-                std::cout<<count1.getTimeMs()<<std::endl;
             }
+            //counter_.countEnd();
+            //std::cout << "camera cost time" << counter_.getTimeMs() << std::endl;
+            //std::this_thread::sleep_for(std::chrono::microseconds(10000));
         }
-        printf("<Acquisition thread Exit!>\n");
+        //printf("<Acquisition thread Exit!>\n");
         return 0;
     }
 
-//----------------------------------------------------------------------------------
-/**
+    //----------------------------------------------------------------------------------
+    /**
 \brief  Get description of input error code
 \param  emErrorStatus  error code
 
 \return void
 */
-//----------------------------------------------------------------------------------
-    void GetErrorString(GX_STATUS emErrorStatus) {
+    //----------------------------------------------------------------------------------
+    void GetErrorString(GX_STATUS emErrorStatus)
+    {
         char *error_info = NULL;
         size_t size = 0;
         GX_STATUS emStatus = GX_STATUS_SUCCESS;
 
         // Get length of error description
         emStatus = GXGetLastError(&emErrorStatus, NULL, &size);
-        if (emStatus != GX_STATUS_SUCCESS) {
+        if (emStatus != GX_STATUS_SUCCESS)
+        {
             printf("<Error when calling GXGetLastError>\n");
             return;
         }
 
         // Alloc error resources
         error_info = new char[size];
-        if (error_info == NULL) {
+        if (error_info == NULL)
+        {
             printf("<Failed to allocate memory>\n");
             return;
         }
 
         // Get error description
         emStatus = GXGetLastError(&emErrorStatus, error_info, &size);
-        if (emStatus != GX_STATUS_SUCCESS) {
+        if (emStatus != GX_STATUS_SUCCESS)
+        {
             printf("<Error when calling GXGetLastError>\n");
-        } else {
-            printf("%s\n", (char *) error_info);
+        }
+        else
+        {
+            printf("%s\n", (char *)error_info);
         }
 
         // Realease error resources
-        if (error_info != NULL) {
-            delete[]error_info;
+        if (error_info != NULL)
+        {
+            delete[] error_info;
             error_info = NULL;
         }
     }

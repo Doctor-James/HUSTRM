@@ -14,6 +14,7 @@ driver/camera/CMakeFiles/camera.dir/src/DAHEN_camera.cpp.o: ../driver/camera/src
 driver/camera/CMakeFiles/camera.dir/src/GxCamera.cpp.o: ../driver/camera/inc/DxImageProc.h
 driver/camera/CMakeFiles/camera.dir/src/GxCamera.cpp.o: ../driver/camera/inc/GxCamera.h
 driver/camera/CMakeFiles/camera.dir/src/GxCamera.cpp.o: ../driver/camera/inc/GxIAPI.h
+driver/camera/CMakeFiles/camera.dir/src/GxCamera.cpp.o: ../thread/inc/thread.h
 driver/camera/CMakeFiles/camera.dir/src/GxCamera.cpp.o: ../tool/inc/tool_Drawcurve.h
 driver/camera/CMakeFiles/camera.dir/src/GxCamera.cpp.o: ../tool/inc/tool_config.h
 driver/camera/CMakeFiles/camera.dir/src/GxCamera.cpp.o: ../tool/inc/tool_time.h

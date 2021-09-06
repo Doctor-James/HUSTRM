@@ -298,6 +298,19 @@ CMakeFiles/thread.dir/solvePNP/src/transform.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/thread.dir/solvePNP/src/transform.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/zjl/code/RM2022/AIM_HUST/solvePNP/src/transform.cpp -o CMakeFiles/thread.dir/solvePNP/src/transform.cpp.s
 
+CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.o: CMakeFiles/thread.dir/flags.make
+CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.o: ../solvePNP/src/KalmanFilter.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.o"
+	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.o -c /home/zjl/code/RM2022/AIM_HUST/solvePNP/src/KalmanFilter.cpp
+
+CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/zjl/code/RM2022/AIM_HUST/solvePNP/src/KalmanFilter.cpp > CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.i
+
+CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/zjl/code/RM2022/AIM_HUST/solvePNP/src/KalmanFilter.cpp -o CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.s
+
 # Object files for target thread
 thread_OBJECTS = \
 "CMakeFiles/thread.dir/thread/src/serialPortReadThread.cpp.o" \
@@ -316,7 +329,8 @@ thread_OBJECTS = \
 "CMakeFiles/thread.dir/thread/src/armorThread.cpp.o" \
 "CMakeFiles/thread.dir/thread/src/thread.cpp.o" \
 "CMakeFiles/thread.dir/solvePNP/src/solvePNP.cpp.o" \
-"CMakeFiles/thread.dir/solvePNP/src/transform.cpp.o"
+"CMakeFiles/thread.dir/solvePNP/src/transform.cpp.o" \
+"CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.o"
 
 # External object files for target thread
 thread_EXTERNAL_OBJECTS =
@@ -338,9 +352,10 @@ libthread.a: CMakeFiles/thread.dir/thread/src/armorThread.cpp.o
 libthread.a: CMakeFiles/thread.dir/thread/src/thread.cpp.o
 libthread.a: CMakeFiles/thread.dir/solvePNP/src/solvePNP.cpp.o
 libthread.a: CMakeFiles/thread.dir/solvePNP/src/transform.cpp.o
+libthread.a: CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.o
 libthread.a: CMakeFiles/thread.dir/build.make
 libthread.a: CMakeFiles/thread.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Linking CXX static library libthread.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Linking CXX static library libthread.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/thread.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/thread.dir/link.txt --verbose=$(VERBOSE)
 

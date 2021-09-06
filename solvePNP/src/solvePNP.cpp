@@ -87,9 +87,11 @@ namespace ly
             Points3D.emplace_back(cv::Point3f(-0.1150f,-0.0275f,0.f));
         }
 
+        
         if(Points3D.size()==4||Points2D.size()==4)
         {
             solvePnP(Points3D, Points2D, camera_matrix, distortion_coefficients, rvec, tvec, false,cv::SOLVEPNP_ITERATIVE);
+            //solvePnPRansac(Points3D, Points2D, camera_matrix, distortion_coefficients, rvec, tvec, false,cv::SOLVEPNP_AP3P);
         }
 
 
@@ -118,61 +120,7 @@ namespace ly
 */
     }
 
-    void solvePNP::solve_BUFF(receiveData receiveData_,std::vector<cv::Point2f> Points2D_,double angle)
-    {
 
-        Points3D.clear();
-        Points2D.clear();
-        if(Points2D_.size()!=4)
-        {
-            return;
-        }
-        Points2D = Points2D_;
-        Points3D.emplace_back(cv::Point3f(0.115f, 0.071f, 0.f));
-        Points3D.emplace_back(cv::Point3f(-0.115f, 0.071f, 0.f));
-        Points3D.emplace_back(cv::Point3f(-0.115f, -0.071f, 0.f));
-        Points3D.emplace_back(cv::Point3f(0.115f, -0.071f, 0.f));
-//        Points3D.emplace_back(cv::Point3f(0.1025f, 0.071f, 0.f));
-//        Points3D.emplace_back(cv::Point3f(-0.1025f, 0.071f, 0.f));
-//        Points3D.emplace_back(cv::Point3f(-0.1225f, -0.071f, 0.f));
-//        Points3D.emplace_back(cv::Point3f(0.1225f, -0.071f, 0.f));
-        if(Points3D.size()==4||Points2D.size()==4)
-        {
-            solvePnP(Points3D, Points2D, camera_matrix, distortion_coefficients, rvec, tvec, false,cv::SOLVEPNP_ITERATIVE);
-        }
-        double temp = rvec.ptr<double>(0)[1];
-        rvec.ptr<double>(0)[1] = rvec.ptr<double>(0)[2];
-        rvec.ptr<double>(0)[2] = temp;
-        temp = tvec.ptr<double>(0)[1];
-        tvec.ptr<double>(0)[1] = tvec.ptr<double>(0)[2];
-        tvec.ptr<double>(0)[2] = temp;
-
-        //下面是将mat类型的旋转/平移向量转换为SE3型的TF
-        cv::Mat R;
-        cv::Rodrigues(rvec,R); //旋转矢量转换为旋转矩阵
-        Eigen::Matrix3d Rotate_M = Eigen::Matrix3d::Identity();
-        cv::cv2eigen(R,Rotate_M);
-        Sophus::SO3 rotate(Rotate_M);
-        Eigen::Vector3d translate(tvec.ptr<double>(0)[0],tvec.ptr<double>(0)[1],-tvec.ptr<double>(0)[2]);
-        TF = Sophus::SE3(rotate,translate);
-//        std::cout<<"yawtemp"<<rvec.at<double>(1)*180.0f/3.14159f<<std::endl;
-        transform_->trans_BUFF(TF,receiveData_,angle);
-
-    }
-
-    void solvePNP::setTgc(float pitch, float yaw, float roll)
-    {
-        Eigen::Matrix3d rotation_matrix3;
-        rotation_matrix3 = Eigen::AngleAxisd(0, Eigen::Vector3d::UnitY()) *
-                           Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) *
-                           Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitX());
-        cv::Mat temp = cv::Mat::ones(3,3,CV_8UC1);
-        cv::eigen2cv(rotation_matrix3,temp);
-        Tgc = (cv::Mat_<double>(3, 4) <<
-                                      temp.at<double>(0,0), temp.at<double>(0,1), temp.at<double>(0,2), 0,//A 状态转移矩阵
-                temp.at<double>(1,0), temp.at<double>(1,1), temp.at<double>(1,2), 0,
-                temp.at<double>(2,0), temp.at<double>(2,1), temp.at<double>(2,2), 0);
-    }
 
 }
 

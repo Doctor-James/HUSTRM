@@ -119,6 +119,8 @@ serialPortWriteThread.h
 ../solvePNP/inc/serialPortWriteThread.h
 algorithm
 -
+math.h
+-
 
 ../thread/inc/serialPortReadThread.h
 serialPort.h
@@ -148,6 +150,8 @@ thread.h
 mutex
 -
 thread
+-
+condition_variable
 -
 
 ../tool/inc/tool_Drawcurve.h

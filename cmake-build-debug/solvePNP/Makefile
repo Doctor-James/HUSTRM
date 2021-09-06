@@ -160,6 +160,33 @@ solvePNP/fast:
 	cd /home/zjl/code/RM2022/AIM_HUST/cmake-build-debug && $(MAKE) $(MAKESILENT) -f solvePNP/CMakeFiles/solvePNP.dir/build.make solvePNP/CMakeFiles/solvePNP.dir/build
 .PHONY : solvePNP/fast
 
+src/KalmanFilter.o: src/KalmanFilter.cpp.o
+
+.PHONY : src/KalmanFilter.o
+
+# target to build an object file
+src/KalmanFilter.cpp.o:
+	cd /home/zjl/code/RM2022/AIM_HUST/cmake-build-debug && $(MAKE) $(MAKESILENT) -f solvePNP/CMakeFiles/trans.dir/build.make solvePNP/CMakeFiles/trans.dir/src/KalmanFilter.cpp.o
+.PHONY : src/KalmanFilter.cpp.o
+
+src/KalmanFilter.i: src/KalmanFilter.cpp.i
+
+.PHONY : src/KalmanFilter.i
+
+# target to preprocess a source file
+src/KalmanFilter.cpp.i:
+	cd /home/zjl/code/RM2022/AIM_HUST/cmake-build-debug && $(MAKE) $(MAKESILENT) -f solvePNP/CMakeFiles/trans.dir/build.make solvePNP/CMakeFiles/trans.dir/src/KalmanFilter.cpp.i
+.PHONY : src/KalmanFilter.cpp.i
+
+src/KalmanFilter.s: src/KalmanFilter.cpp.s
+
+.PHONY : src/KalmanFilter.s
+
+# target to generate assembly for a file
+src/KalmanFilter.cpp.s:
+	cd /home/zjl/code/RM2022/AIM_HUST/cmake-build-debug && $(MAKE) $(MAKESILENT) -f solvePNP/CMakeFiles/trans.dir/build.make solvePNP/CMakeFiles/trans.dir/src/KalmanFilter.cpp.s
+.PHONY : src/KalmanFilter.cpp.s
+
 src/solvePNP.o: src/solvePNP.cpp.o
 
 .PHONY : src/solvePNP.o
@@ -224,6 +251,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... solvePNP"
 	@echo "... trans"
+	@echo "... src/KalmanFilter.o"
+	@echo "... src/KalmanFilter.i"
+	@echo "... src/KalmanFilter.s"
 	@echo "... src/solvePNP.o"
 	@echo "... src/solvePNP.i"
 	@echo "... src/solvePNP.s"

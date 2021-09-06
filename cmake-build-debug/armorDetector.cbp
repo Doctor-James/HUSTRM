@@ -562,6 +562,10 @@
 		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/main.h">
 			<Option target="armorDetector"/>
 		</Unit>
+		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/solvePNP/src/KalmanFilter.cpp">
+			<Option target="thread"/>
+			<Option target="trans"/>
+		</Unit>
 		<Unit filename="/home/zjl/code/RM2022/AIM_HUST/solvePNP/src/solvePNP.cpp">
 			<Option target="thread"/>
 			<Option target="solvePNP"/>

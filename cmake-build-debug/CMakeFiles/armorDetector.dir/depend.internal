@@ -7,7 +7,6 @@ CMakeFiles/armorDetector.dir/armorDetector.cpp.o
  ../armor/inc/buff.h
  ../armor/inc/lightBar.h
  ../armor/inc/score.h
- ../driver/camera/inc/DAHEN_camera.h
  ../driver/camera/inc/DxImageProc.h
  ../driver/camera/inc/GxCamera.h
  ../driver/camera/inc/GxIAPI.h
@@ -225,7 +224,6 @@ CMakeFiles/armorDetector.dir/main.cpp.o
  ../armor/inc/buff.h
  ../armor/inc/lightBar.h
  ../armor/inc/score.h
- ../driver/camera/inc/DAHEN_camera.h
  ../driver/camera/inc/DxImageProc.h
  ../driver/camera/inc/GxCamera.h
  ../driver/camera/inc/GxIAPI.h

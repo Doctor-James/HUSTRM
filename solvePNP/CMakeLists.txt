@@ -26,6 +26,7 @@ add_library(
 add_library(
 		trans
 		src/transform.cpp
+		src/KalmanFilter.cpp
 )
 target_link_libraries(
         solvePNP

@@ -54,7 +54,8 @@ add_library(thread
         thread/src/thread.cpp
         solvePNP/src/solvePNP.cpp
 		solvePNP/src/transform.cpp
-        )
+		solvePNP/src/KalmanFilter.cpp        
+		)
 
 target_link_libraries(
         armorDetector

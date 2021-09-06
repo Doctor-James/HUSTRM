@@ -56,6 +56,14 @@ tools.h
 opencv2/opencv.hpp
 -
 
+../thread/inc/thread.h
+mutex
+-
+thread
+-
+condition_variable
+-
+
 ../tool/inc/tool_Drawcurve.h
 iostream
 -
@@ -111,6 +119,10 @@ stdlib.h
 -
 GxCamera.h
 /home/zjl/code/RM2022/AIM_HUST/driver/camera/src/GxCamera.h
+../../thread/inc/thread.h
+/home/zjl/code/RM2022/AIM_HUST/driver/thread/inc/thread.h
+
+/home/zjl/code/RM2022/AIM_HUST/driver/camera/src/HIK_camera.cpp
 
 /home/zjl/code/RM2022/AIM_HUST/driver/camera/src/camera.cpp
 camera.h

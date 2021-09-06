@@ -90,17 +90,32 @@ solvePNP/CMakeFiles/trans.dir/src/transform.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/trans.dir/src/transform.cpp.s"
 	cd /home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/zjl/code/RM2022/AIM_HUST/solvePNP/src/transform.cpp -o CMakeFiles/trans.dir/src/transform.cpp.s
 
+solvePNP/CMakeFiles/trans.dir/src/KalmanFilter.cpp.o: solvePNP/CMakeFiles/trans.dir/flags.make
+solvePNP/CMakeFiles/trans.dir/src/KalmanFilter.cpp.o: ../solvePNP/src/KalmanFilter.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object solvePNP/CMakeFiles/trans.dir/src/KalmanFilter.cpp.o"
+	cd /home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP && /usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/trans.dir/src/KalmanFilter.cpp.o -c /home/zjl/code/RM2022/AIM_HUST/solvePNP/src/KalmanFilter.cpp
+
+solvePNP/CMakeFiles/trans.dir/src/KalmanFilter.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/trans.dir/src/KalmanFilter.cpp.i"
+	cd /home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/zjl/code/RM2022/AIM_HUST/solvePNP/src/KalmanFilter.cpp > CMakeFiles/trans.dir/src/KalmanFilter.cpp.i
+
+solvePNP/CMakeFiles/trans.dir/src/KalmanFilter.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/trans.dir/src/KalmanFilter.cpp.s"
+	cd /home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/zjl/code/RM2022/AIM_HUST/solvePNP/src/KalmanFilter.cpp -o CMakeFiles/trans.dir/src/KalmanFilter.cpp.s
+
 # Object files for target trans
 trans_OBJECTS = \
-"CMakeFiles/trans.dir/src/transform.cpp.o"
+"CMakeFiles/trans.dir/src/transform.cpp.o" \
+"CMakeFiles/trans.dir/src/KalmanFilter.cpp.o"
 
 # External object files for target trans
 trans_EXTERNAL_OBJECTS =
 
 solvePNP/libtrans.a: solvePNP/CMakeFiles/trans.dir/src/transform.cpp.o
+solvePNP/libtrans.a: solvePNP/CMakeFiles/trans.dir/src/KalmanFilter.cpp.o
 solvePNP/libtrans.a: solvePNP/CMakeFiles/trans.dir/build.make
 solvePNP/libtrans.a: solvePNP/CMakeFiles/trans.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libtrans.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libtrans.a"
 	cd /home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP && $(CMAKE_COMMAND) -P CMakeFiles/trans.dir/cmake_clean_target.cmake
 	cd /home/zjl/code/RM2022/AIM_HUST/cmake-build-debug/solvePNP && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/trans.dir/link.txt --verbose=$(VERBOSE)
 

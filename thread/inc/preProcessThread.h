@@ -11,7 +11,7 @@
 namespace ly
 {
 
-    class preProcessThread:public lightBar,public thread
+    class preProcessThread : public lightBar, public thread
     {
     public:
         /*!
@@ -20,14 +20,14 @@ namespace ly
          * @param camera
          * @return none
          */
-        explicit preProcessThread(lightBar_param config,cameraThread *camera,serialPortReadThread *serialPortRead,serialPortWriteThread *serialPortWrite);
+        explicit preProcessThread(lightBar_param config, cameraThread *camera, serialPortReadThread *serialPortRead, serialPortWriteThread *serialPortWrite);
         /*!
          * @name getLightBarQue
          * @brief 获取roi区域
          * @param none
          * @return roi区域
          */
-        std::priority_queue<lightBarNode> getLightBarQue() override ;       // override:对lightBarThread中函数的重写
+        std::priority_queue<lightBarNode> getLightBarQue() override; // override:对lightBarThread中函数的重写
         /*!
          * @name checkupdate
          * @brief 检查update_的状态，获取是否需要更新的信息
@@ -42,10 +42,11 @@ namespace ly
          * @return ROI区域
          */
         std::priority_queue<lightBarNode> ROI(std::priority_queue<lightBarNode> lightBar);
+
     private:
         cameraThread *camera_ = nullptr;
-        serialPortReadThread* serialPortRead_ = nullptr;
-        serialPortWriteThread* serialPortWrite_ = nullptr;
+        serialPortReadThread *serialPortRead_ = nullptr;
+        serialPortWriteThread *serialPortWrite_ = nullptr;
         /*!
          * @name process
          * @brief 检测灯条，计算roi
@@ -55,11 +56,11 @@ namespace ly
         void process();
         Mat pic_;
         std::priority_queue<lightBarNode> ROI_;
-        float width_ceo = 3;                        //全图检测时roi宽度的放大倍数
-        float length_ceo = 1.5;                       //全图检测时roi长度的放大倍数
-        bool update_ = false;
+        float width_ceo = 3;    //全图检测时roi宽度的放大倍数
+        float length_ceo = 1.5; //全图检测时roi长度的放大倍数
+        bool update_ = false;   //检测灯条数据是否已经更新
         time counter_;
-        std::vector<receiveData> receive_Data ;
+        std::vector<receiveData> receive_Data;
         int colour;
     };
 }

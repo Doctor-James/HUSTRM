@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/trans.dir/src/KalmanFilter.cpp.o"
   "CMakeFiles/trans.dir/src/transform.cpp.o"
   "libtrans.a"
   "libtrans.pdb"

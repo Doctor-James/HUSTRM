@@ -6,7 +6,6 @@ CMakeFiles/armorDetector.dir/armorDetector.cpp.o: ../armor/inc/armor.h
 CMakeFiles/armorDetector.dir/armorDetector.cpp.o: ../armor/inc/buff.h
 CMakeFiles/armorDetector.dir/armorDetector.cpp.o: ../armor/inc/lightBar.h
 CMakeFiles/armorDetector.dir/armorDetector.cpp.o: ../armor/inc/score.h
-CMakeFiles/armorDetector.dir/armorDetector.cpp.o: ../driver/camera/inc/DAHEN_camera.h
 CMakeFiles/armorDetector.dir/armorDetector.cpp.o: ../driver/camera/inc/DxImageProc.h
 CMakeFiles/armorDetector.dir/armorDetector.cpp.o: ../driver/camera/inc/GxCamera.h
 CMakeFiles/armorDetector.dir/armorDetector.cpp.o: ../driver/camera/inc/GxIAPI.h
@@ -224,7 +223,6 @@ CMakeFiles/armorDetector.dir/main.cpp.o: ../armor/inc/armor.h
 CMakeFiles/armorDetector.dir/main.cpp.o: ../armor/inc/buff.h
 CMakeFiles/armorDetector.dir/main.cpp.o: ../armor/inc/lightBar.h
 CMakeFiles/armorDetector.dir/main.cpp.o: ../armor/inc/score.h
-CMakeFiles/armorDetector.dir/main.cpp.o: ../driver/camera/inc/DAHEN_camera.h
 CMakeFiles/armorDetector.dir/main.cpp.o: ../driver/camera/inc/DxImageProc.h
 CMakeFiles/armorDetector.dir/main.cpp.o: ../driver/camera/inc/GxCamera.h
 CMakeFiles/armorDetector.dir/main.cpp.o: ../driver/camera/inc/GxIAPI.h

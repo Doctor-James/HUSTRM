@@ -504,6 +504,33 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/armorDetector.dir/build.make CMakeFiles/armorDetector.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+solvePNP/src/KalmanFilter.o: solvePNP/src/KalmanFilter.cpp.o
+
+.PHONY : solvePNP/src/KalmanFilter.o
+
+# target to build an object file
+solvePNP/src/KalmanFilter.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread.dir/build.make CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.o
+.PHONY : solvePNP/src/KalmanFilter.cpp.o
+
+solvePNP/src/KalmanFilter.i: solvePNP/src/KalmanFilter.cpp.i
+
+.PHONY : solvePNP/src/KalmanFilter.i
+
+# target to preprocess a source file
+solvePNP/src/KalmanFilter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread.dir/build.make CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.i
+.PHONY : solvePNP/src/KalmanFilter.cpp.i
+
+solvePNP/src/KalmanFilter.s: solvePNP/src/KalmanFilter.cpp.s
+
+.PHONY : solvePNP/src/KalmanFilter.s
+
+# target to generate assembly for a file
+solvePNP/src/KalmanFilter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread.dir/build.make CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.s
+.PHONY : solvePNP/src/KalmanFilter.cpp.s
+
 solvePNP/src/solvePNP.o: solvePNP/src/solvePNP.cpp.o
 
 .PHONY : solvePNP/src/solvePNP.o
@@ -793,6 +820,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... solvePNP/src/KalmanFilter.o"
+	@echo "... solvePNP/src/KalmanFilter.i"
+	@echo "... solvePNP/src/KalmanFilter.s"
 	@echo "... solvePNP/src/solvePNP.o"
 	@echo "... solvePNP/src/solvePNP.i"
 	@echo "... solvePNP/src/solvePNP.s"

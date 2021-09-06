@@ -16,30 +16,45 @@
 #include "serialPortReadThread.h"
 #include "serialPortWriteThread.h"
 #include <algorithm>
+#include <math.h>
 #define DEBUG_TRANS
 namespace ly
 {
+
+    //击打缓冲计算返回
+    typedef struct{
+        float pitch;       //rad
+        float yaw;         //rad
+        float time;        //击打弹道时间(ms)
+        float distance;
+    } Angle_t;
+
+    typedef struct{
+        float pitch;
+        float yaw;
+        float ShootSpeed = 15;
+        double BeginToNowTime = 0;
+    } carPose;
+
 
     class transform
     {
     public:
         transform(serialPortReadThread *serialPortRead,serialPortWriteThread *serialPortWrite);
-        Sophus::SE3 armor_;
+        Sophus::SE3 armor_now;
+        Sophus::SE3 armor_pre;
         Sophus::SE3 last_armor_;
         void setArmor2Cam(Sophus::SE3 armor2cam,receiveData receiveData_);
-        void trans_BUFF(Sophus::SE3 armor2cam,receiveData receiveData_,double angle);
-        void trans_BUFF_amend(double x,double y,double r,Sophus::SE3 armor2cam,double yaw,receiveData receiveData_);
+
         //弹道
-        Eigen::Vector2f ballistic_equation(float gim_pitch);
+        Angle_t ballistic_equation(float gim_pitch,cv::Point3f armor_Position);
         float forward_ballistic_equation(float angle,float x);
         float derivation(float angle,float x);
-        float m_set_speed = 27;
 
-        int publish();
-        float trajectory(float distance);
-        double pitch;
-        double yaw;
-        double temp;
+        //kalman filter
+        cv::Point3f set_KF(cv::Point3f Position_now);
+        void First_Filter(cv::Point3f Position_now);
+        void Continuous_Filter(cv::Point3f Position_now);
         sendData sendData_;
     private:
         serialPortReadThread *serialPortRead_;
@@ -50,25 +65,28 @@ namespace ly
         Sophus::SE3 gimbal_;
         Sophus::SE3 shooter_;
         Sophus::SE3 gimbal_to_cam_;
-        FILE *file_angle;
-        FILE *file_pitch;
-        FILE *file_yaw;
-        std::ifstream *fangle;
-        std::ifstream *fpitch;
-        std::ifstream *fyaw;
+        Angle_t shootAngleTime_now;
+        Angle_t shootAngleTime_pre;
+        carPose carPose_now;
+        carPose carPose_old;
+        carPose carPose_;
+        float i_debug =1;
+
         // kalman filter
         // x y z theta_x theta_y theta_z
-        cv::Mat measurement_;
         cv::KalmanFilter KF_;
-        cv::Mat state_;
-        cv::Mat processNoise_;
-        cv::Mat KF_prediction=cv::Mat::zeros(4, 1, CV_32F);
-        cv::Mat prediction=cv::Mat::zeros(2, 1, CV_32F);
-        float delta_t;
-        float distance;
+        cv::Mat measurement_;
+        bool is_nfirst_KF = false;
+        bool first_find_temp = false;
+        cv::Point3f Position_old;
+        cv::Point3f Position_pre;
+        cv::Point3f v_old;
+        cv::Point3f v_pre;
+
         int debug_ = 0;
         time counter_;
         DrawCurve DrawCurve_;
+
 #ifdef DEBUG_TRANS
         inline void glDrawColouredCuboid(const Sophus::SE3 T, GLfloat a = 0.175f,GLfloat b= 0.004f,GLfloat c=0.055f);
         static void* visual(void* __this);

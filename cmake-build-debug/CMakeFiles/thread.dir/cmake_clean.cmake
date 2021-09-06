@@ -7,6 +7,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/thread.dir/driver/camera/src/GxCamera.cpp.o"
   "CMakeFiles/thread.dir/driver/camera/src/HIK_camera.cpp.o"
   "CMakeFiles/thread.dir/driver/serialPort/src/serialPort.cpp.o"
+  "CMakeFiles/thread.dir/solvePNP/src/KalmanFilter.cpp.o"
   "CMakeFiles/thread.dir/solvePNP/src/solvePNP.cpp.o"
   "CMakeFiles/thread.dir/solvePNP/src/transform.cpp.o"
   "CMakeFiles/thread.dir/thread/src/armorThread.cpp.o"

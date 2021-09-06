@@ -1,6 +1,6 @@
 {
    "cam_device": {
-      "deviceType" :3,
+      "deviceType" :1,
       "videoPath" :"../video/3.avi",
       "picturePath" :"/home/zjl/code/AIM_HUST/video/1.jpg",
       "picNum": 27,

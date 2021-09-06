@@ -5,7 +5,9 @@
  */
 
 #include "lightBar.h"
-
+//#define RGB
+#define HSV
+//#define HSV_DEBUG_
 namespace ly
 {
     lightBar::lightBar(lightBar_param config)
@@ -21,6 +23,7 @@ namespace ly
         distance_Ceo_ = new score(config_.distance);
         thresh_ = config_.thresh;
         ROI_Pt_ = cv::Point2f(0,0);
+        iLowH = 0, iLowS = 233, iLowV = 233, iHighH = 10, iHighS = 255, iHighV = 255;
     }
     lightBar::~lightBar()
     {
@@ -46,6 +49,7 @@ namespace ly
         }
         else{                                               //先前帧有合适的roi
             int times = preLBQ.size()>5?5:(int)preLBQ.size();
+
             for(int i=0;i<times;i++)
             {
                 auto length = (int)(preLBQ.top().length);
@@ -98,6 +102,8 @@ namespace ly
             ROI_Pt_ = cv::Point2f(0,0);
             ROI = rawPic.mat;
         }
+
+#ifdef RGB
         cv::Mat subtract_dst;                           //红蓝通道相减得到的图
         cv::Mat thresh;                                 //二值化后的单通道图像
         std::vector<cv::Mat> rgb_vec;                   //三通道的颜色向量
@@ -118,6 +124,47 @@ namespace ly
             cv::subtract(rgb_vec[2], rgb_vec[0], subtract_dst);
             cv::threshold(subtract_dst, thresh, thresh_, 255, cv::THRESH_BINARY );
         }
+#endif
+
+#ifdef HSV_DEBUG_
+        cv::Mat imgHSVDebug;                           //红蓝通道相减得到的图
+        cv::Mat threshDebug;                                 //二值化后的单通道图像
+        cv::Mat element;
+        cv::cvtColor(rawPic.mat, imgHSVDebug, cv::COLOR_BGR2HSV); //BGR转换为HSV空间
+        std::vector<cv::Mat> hsvSplitDebug;
+        cv::split(imgHSVDebug, hsvSplitDebug);
+        cv::equalizeHist(hsvSplitDebug[2], hsvSplitDebug[2]);
+        cv::merge(hsvSplitDebug, imgHSVDebug);
+        inRange(imgHSVDebug, cv::Scalar(iLowH, iLowS, iLowV), cv::Scalar(iHighH, iHighS, iHighV), threshDebug); //Threshold the image
+
+        element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+        //dilate(imgThresholded,imgThresholded,element);
+        cv::morphologyEx(threshDebug, threshDebug, cv::MORPH_OPEN, element);  //开操作
+        cv::namedWindow("imgThresholded",1);
+        cv::createTrackbar( "iLowH : ","imgThresholded", &iLowH, 255, NULL);
+        cv::createTrackbar( "iLowS : ","imgThresholded", &iLowS, 255, NULL);
+        cv::createTrackbar( "iLowV : ","imgThresholded", &iLowV, 255, NULL);
+        cv::createTrackbar( "iHighH : ","imgThresholded", &iHighH, 255, NULL);
+        cv::createTrackbar( "iHighS : ","imgThresholded", &iHighS, 255, NULL);
+        cv::createTrackbar( "iHighV : ","imgThresholded", &iHighV, 255, NULL);
+        imshow("imgThresholded",threshDebug);
+        cv::waitKey(10);
+
+#endif
+
+#ifdef HSV
+        cv::Mat imgHSV;                           //红蓝通道相减得到的图
+        cv::Mat thresh;                                 //二值化后的单通道图像
+        std::vector<std::vector<cv::Point> > contours;  //轮廓点集
+
+        cv::cvtColor(ROI, imgHSV, cv::COLOR_BGR2HSV); //BGR转换为HSV空间
+        std::vector<cv::Mat> hsvSplit;
+        cv::split(imgHSV, hsvSplit);
+        cv::equalizeHist(hsvSplit[2], hsvSplit[2]);
+        cv::merge(hsvSplit, imgHSV);
+        inRange(imgHSV, cv::Scalar(iLowH, iLowS, iLowV), cv::Scalar(iHighH, iHighS, iHighV), thresh); //Threshold the image
+
+#endif
 //        cv::imshow("thresh", thresh);
 //        static int i = 1;
 //        if(i < 1000){
