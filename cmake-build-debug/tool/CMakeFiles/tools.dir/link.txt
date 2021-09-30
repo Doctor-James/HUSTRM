@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtools.a CMakeFiles/tools.dir/src/tool_config.cpp.o CMakeFiles/tools.dir/src/tool_log.cpp.o CMakeFiles/tools.dir/src/tool_time.cpp.o CMakeFiles/tools.dir/src/tool_Drawcurve.cpp.o
+/usr/bin/ranlib libtools.a

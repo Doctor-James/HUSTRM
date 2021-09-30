@@ -1,0 +1,2 @@
+/usr/bin/ar qc libarmor.a CMakeFiles/armor.dir/src/armor.cpp.o CMakeFiles/armor.dir/src/lightBar.cpp.o CMakeFiles/armor.dir/src/score.cpp.o CMakeFiles/armor.dir/src/RM_BUFF.cpp.o CMakeFiles/armor.dir/src/buff.cpp.o
+/usr/bin/ranlib libarmor.a

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsolvePNP.a CMakeFiles/solvePNP.dir/src/solvePNP.cpp.o
+/usr/bin/ranlib libsolvePNP.a

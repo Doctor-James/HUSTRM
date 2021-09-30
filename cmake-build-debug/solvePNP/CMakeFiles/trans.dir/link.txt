@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtrans.a CMakeFiles/trans.dir/src/transform.cpp.o CMakeFiles/trans.dir/src/KalmanFilter.cpp.o
+/usr/bin/ranlib libtrans.a
