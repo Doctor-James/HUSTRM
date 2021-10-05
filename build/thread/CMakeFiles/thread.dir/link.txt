@@ -1,2 +1,0 @@
-/usr/bin/ar qc libthread.a  CMakeFiles/thread.dir/src/SharedData.cpp.o CMakeFiles/thread.dir/src/armorThread.cpp.o CMakeFiles/thread.dir/src/cameraThread.cpp.o CMakeFiles/thread.dir/src/lightBarThread.cpp.o CMakeFiles/thread.dir/src/serialPortReadThread.cpp.o CMakeFiles/thread.dir/src/serialPortWriteThread.cpp.o CMakeFiles/thread.dir/src/thread.cpp.o
-/usr/bin/ranlib libthread.a
