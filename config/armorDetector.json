@@ -1,11 +1,9 @@
 {
    "cam_device": {
-      "deviceType" :1,
-      "videoPath" :"../video/3.avi",
-      "picturePath" :"/home/zjl/code/AIM_HUST/video/1.jpg",
-      "picNum": 27,
-      "HIK_CAM": "none",
-      "DAHEN_CAM": "none"
+      "deviceType" :3,
+      "videoPath" :"../video/pnp_4m.avi",
+      "picturePath" :"../video_/pic/save_data/2.jpg",
+      "picNum": 27
    },
    "serialPort_dev": {
       "enable": 1,
@@ -21,7 +19,7 @@
    },
    "lightBar_param": {
       "thresh": 55,
-      "color": "red",
+      "color": 0,
       "lengthWidthRadio": {
          "enable": 1,
          "best": 2.5,

@@ -1,34 +1,38 @@
-
-//--------------------------------------------------------------------------------
-/**
-\file     GxCamera.cpp
-\brief    GxCamera class defination
-
-\date     2020-05-14
-\author   Mountain
-
-*/
-//----------------------------------------------------------------------------------
-
-#include <stdlib.h>
 #include "GxCamera.h"
-#include "../../thread/inc/thread.h"
 namespace ly
 {
-    struct timeval start;
     GxCamera::GxCamera()
     {
         g_hDevice = NULL; ///< Device handle
-        g_pDeviceSN = "KE0200060396";
+        g_pDeviceSN = "KE0200060397";
         g_bColorFilter = false;                  ///< Color filter support flag
         g_i64ColorFilter = GX_COLOR_FILTER_NONE; ///< Color filter of device
         g_bAcquisitionFlag = true;               ///< Thread running flag
         g_nAcquisitonThreadID = 0;               ///< Thread ID of Acquisition thread
         g_nPayloadSize = 0;                      ///< Payload size 有效负载
+
+        //init camrea lib
+        this->initLib();
+        //open device SN号
+        this->openDevice(g_pDeviceSN);
+        //Attention:   (Width-64)%2=0; (Height-64)%2=0; X%16=0; Y%2=0;
+        int64_t width = 1280;
+        int64_t height = 1024;
+        int64_t OffsetX = 0;
+        int64_t OffsetY = 0;
+        //   ROI             Width  Height        X       Y
+        this->setRoiParam(width, height, OffsetX, OffsetY);
+        //   ExposureGain          autoExposure  autoGain  ExposureTime  AutoExposureMin  AutoExposureMax  Gain(<=16)  AutoGainMin  AutoGainMax  GrayValue
+        this->setExposureGainParam(false, false, 5000, 1000, 3000, 3, 5, 16, 127);
+        //   WhiteBalance             Applied?       light source type
+        this->setWhiteBalanceParam(false, GX_AWB_LAMP_HOUSE_ADAPTIVE);
+        //   Acquisition Start!
+        this->acquisitionStart(&frame_);
     }
 
     GxCamera::~GxCamera()
     {
+        this->acquisitionEnd();
     }
 
     /// Initialize libary
@@ -194,33 +198,32 @@ namespace ly
     void
     GxCamera::setExposureGainParam(bool AutoExposure, bool AutoGain, double ExposureTime, double AutoExposureTimeMin,
                                    double AutoExposureTimeMax, double Gain, double AutoGainMin, double AutoGainMax,
-                                   int64_t GrayValue,bool TRIGGER_SOURCE_LINE2)
+                                   int64_t GrayValue)
     {
-        exposure_gain_trigger.m_bAutoExposure = AutoExposure;
-        exposure_gain_trigger.m_bAutoGain = AutoGain;
-        exposure_gain_trigger.m_dExposureTime = ExposureTime;
-        exposure_gain_trigger.m_dAutoExposureTimeMin = AutoExposureTimeMin;
-        exposure_gain_trigger.m_dAutoExposureTimeMax = AutoExposureTimeMax;
-        exposure_gain_trigger.m_dGain = Gain;
-        exposure_gain_trigger.m_dAutoGainMin = AutoGainMin;
-        exposure_gain_trigger.m_dAutoGainMax = AutoGainMax;
-        exposure_gain_trigger.m_i64GrayValue = GrayValue;
-        exposure_gain_trigger.TRIGGER_SOURCE_LINE2 = TRIGGER_SOURCE_LINE2;
+        exposure_gain.m_bAutoExposure = AutoExposure;
+        exposure_gain.m_bAutoGain = AutoGain;
+        exposure_gain.m_dExposureTime = ExposureTime;
+        exposure_gain.m_dAutoExposureTimeMin = AutoExposureTimeMin;
+        exposure_gain.m_dAutoExposureTimeMax = AutoExposureTimeMax;
+        exposure_gain.m_dGain = Gain;
+        exposure_gain.m_dAutoGainMin = AutoGainMin;
+        exposure_gain.m_dAutoGainMax = AutoGainMax;
+        exposure_gain.m_i64GrayValue = GrayValue;
     }
 
     /// Set camera exposure and gain
-    GX_STATUS GxCamera::setExposureGainTrigger()
+    GX_STATUS GxCamera::setExposureGain()
     {
         GX_STATUS status;
 
         // Set Exposure
-        if (exposure_gain_trigger.m_bAutoExposure)
+        if (exposure_gain.m_bAutoExposure)
         {
             status = GXSetEnum(g_hDevice, GX_ENUM_EXPOSURE_AUTO, GX_EXPOSURE_AUTO_CONTINUOUS);
             GX_VERIFY(status);
-            status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_EXPOSURE_TIME_MAX, exposure_gain_trigger.m_dAutoExposureTimeMax);
+            status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_EXPOSURE_TIME_MAX, exposure_gain.m_dAutoExposureTimeMax);
             GX_VERIFY(status);
-            status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_EXPOSURE_TIME_MIN, exposure_gain_trigger.m_dAutoExposureTimeMin);
+            status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_EXPOSURE_TIME_MIN, exposure_gain.m_dAutoExposureTimeMin);
             GX_VERIFY(status);
         }
         else
@@ -229,18 +232,18 @@ namespace ly
             GX_VERIFY(status);
             status = GXSetEnum(g_hDevice, GX_ENUM_EXPOSURE_AUTO, GX_EXPOSURE_AUTO_OFF);
             GX_VERIFY(status);
-            status = GXSetFloat(g_hDevice, GX_FLOAT_EXPOSURE_TIME, exposure_gain_trigger.m_dExposureTime);
+            status = GXSetFloat(g_hDevice, GX_FLOAT_EXPOSURE_TIME, exposure_gain.m_dExposureTime);
             GX_VERIFY(status);
         }
 
         // Set Gain
-        if (exposure_gain_trigger.m_bAutoGain)
+        if (exposure_gain.m_bAutoGain)
         {
             status = GXSetEnum(g_hDevice, GX_ENUM_GAIN_AUTO, GX_GAIN_AUTO_CONTINUOUS);
             GX_VERIFY(status);
-            status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_GAIN_MAX, exposure_gain_trigger.m_dAutoGainMax);
+            status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_GAIN_MAX, exposure_gain.m_dAutoGainMax);
             GX_VERIFY(status);
-            status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_GAIN_MIN, exposure_gain_trigger.m_dAutoGainMin);
+            status = GXSetFloat(g_hDevice, GX_FLOAT_AUTO_GAIN_MIN, exposure_gain.m_dAutoGainMin);
             GX_VERIFY(status);
         }
         else
@@ -249,29 +252,12 @@ namespace ly
             GX_VERIFY(status);
             status = GXSetEnum(g_hDevice, GX_ENUM_GAIN_SELECTOR, GX_GAIN_SELECTOR_ALL);
             GX_VERIFY(status);
-            status = GXSetFloat(g_hDevice, GX_FLOAT_GAIN, exposure_gain_trigger.m_dGain);
+            status = GXSetFloat(g_hDevice, GX_FLOAT_GAIN, exposure_gain.m_dGain);
             GX_VERIFY(status);
-        }
-        if(exposure_gain_trigger.TRIGGER_SOURCE_LINE2)
-        {
-            //设 置 触 发 模 式 为 ON
-            status =GXSetEnum(g_hDevice,GX_ENUM_TRIGGER_MODE, GX_TRIGGER_MODE_ON);
-            //设 置 触 发 激 活 方 式 为 上 升 沿
-            status = GXSetEnum(g_hDevice,GX_ENUM_TRIGGER_ACTIVATION, GX_TRIGGER_ACTIVATION_RISINGEDGE);
-            //设 置 触 发 激 活 方 式 为 外 部 触 发 模 式
-            status =GXSetEnum(g_hDevice,GX_ENUM_TRIGGER_SWITCH,GX_TRIGGER_SWITCH_ON);
-            status =GXSetEnum(g_hDevice,GX_ENUM_TRIGGER_SOURCE,GX_TRIGGER_SOURCE_LINE2);
-        }
-        else
-        {
-            status =GXSetEnum(g_hDevice,GX_ENUM_TRIGGER_MODE, GX_TRIGGER_MODE_OFF);
-            //设 置 触 发 激 活 方 式 为 上 升 沿
-            status = GXSetEnum(g_hDevice,GX_ENUM_TRIGGER_ACTIVATION, GX_TRIGGER_ACTIVATION_RISINGEDGE);
-            status =GXSetEnum(g_hDevice,GX_ENUM_TRIGGER_SOURCE,GX_TRIGGER_SOURCE_SOFTWARE);
         }
 
         // Set Expected Gray Value
-        status = GXSetInt(g_hDevice, GX_INT_GRAY_VALUE, exposure_gain_trigger.m_i64GrayValue);
+        status = GXSetInt(g_hDevice, GX_INT_GRAY_VALUE, exposure_gain.m_i64GrayValue);
         GX_VERIFY(status);
 
         return GX_STATUS_SUCCESS;
@@ -362,11 +348,10 @@ namespace ly
     /// Main function to run the whole program
     GX_STATUS GxCamera::acquisitionStart(Mat *image)
     {
-
         //////////////////////////////////////////SOME SETTINGS/////////////////////////////////////////////
-        threadParam.m_hDevice = g_hDevice;
-        threadParam.m_pImage = image;
-        threadParam.g_AcquisitionFlag = &g_bAcquisitionFlag;
+        threadParam->m_hDevice = g_hDevice;
+        threadParam->m_pImage = image;
+        threadParam->g_AcquisitionFlag = &g_bAcquisitionFlag;
 
         GX_STATUS emStatus;
         //Set Roi
@@ -375,7 +360,7 @@ namespace ly
             std::cout << "fail" << std::endl;
         GX_VERIFY_EXIT(emStatus);
         //Set Exposure and Gain
-        emStatus = setExposureGainTrigger();
+        emStatus = setExposureGain();
         GX_VERIFY_EXIT(emStatus);
         //Set WhiteBalance
         emStatus = setWhiteBalance();
@@ -386,8 +371,8 @@ namespace ly
         GX_VERIFY_EXIT(emStatus);
 
         //Set trigger mode
-//        emStatus = GXSetEnum(g_hDevice, GX_ENUM_TRIGGER_MODE, GX_TRIGGER_MODE_OFF);
-//        GX_VERIFY_EXIT(emStatus);
+        emStatus = GXSetEnum(g_hDevice, GX_ENUM_TRIGGER_MODE, GX_TRIGGER_MODE_OFF);
+        GX_VERIFY_EXIT(emStatus);
 
         //Set buffer quantity of acquisition queue
         uint64_t nBufferNum = ACQ_BUFFER_NUM;
@@ -423,36 +408,11 @@ namespace ly
             GX_VERIFY_EXIT(emStatus);
         }
 
-        //////////////////////////////////////////CREATE THREAD/////////////////////////////////////////////
-
-        //Start acquisition thread, if thread create failed, exit this app
-        // int nRet = pthread_create(&g_nAcquisitonThreadID, NULL, ProcGetImage, (void *)&threadParam);
-        // if (nRet != 0)
-        // {
-        //     GXCloseDevice(g_hDevice);
-        //     g_hDevice = NULL;
-        //     GXCloseLib();
-
-        //     printf("<Failed to create the acquisition thread, App Exit!>\n");
-        //     exit(nRet);
-        // }
-
-        //Main loop
-        // bool bRun = true;
-        // while (bRun == true)
-        // {
-        //     printf("????????????????loop is running???????????????????????\n");
-        //     char chKey = getchar();
-        //     if (chKey == 'x' || chKey == 'X')
-        //     {
-        //         break;
-        //     }
-        // }
-
         return 0;
     }
     GX_STATUS GxCamera::acquisitionEnd()
     {
+        printf("<Acquisition thread Exit!>\n");
         GX_STATUS emStatus;
         //////////////////////////////////////////STOP THREAD/////////////////////////////////////////////
 
@@ -495,88 +455,65 @@ namespace ly
 \return void*
 */
     //-------------------------------------------------
-    void *GxCamera::ProcGetImage(void *pAcquisitionThread)
+    GX_STATUS GxCamera::ProcGetImage(ly::Mat &output_frame)
     {
-        //time counter_;
-        GX_STATUS emStatus = GX_STATUS_SUCCESS;
-        //Thread running flag setup
-        AcquisitionThread *threadParam = (AcquisitionThread *)pAcquisitionThread;
-        PGX_FRAME_BUFFER pFrameBuffer = NULL;
-        uint32_t ui32FrameCount = 0;
-
-        if(*(threadParam->g_AcquisitionFlag))
+        // Get a frame from Queue
+        emStatus = GXDQBuf(threadParam->m_hDevice, &pFrameBuffer, 1000);
+        if (emStatus != GX_STATUS_SUCCESS)
         {
-            counter_.countBegin();           
- // Get a frame from Queue
-            emStatus = GXDQBuf(threadParam->m_hDevice, &pFrameBuffer, 1000);
-            if (emStatus != GX_STATUS_SUCCESS)
+            if (emStatus == GX_STATUS_TIMEOUT)
             {
-                if (emStatus == GX_STATUS_TIMEOUT)
-                {
-                    return 0;
-                }
-                else
-                {
-                    GetErrorString(emStatus);
-                    return 0;
-                }
-            }
-
-            if (pFrameBuffer->nStatus != GX_FRAME_STATUS_SUCCESS)
-            {
-                printf("<Abnormal Acquisition: Exception code: %d>\n", pFrameBuffer->nStatus);
+                return false;
             }
             else
             {
-                cv::Mat src;
-                src.create(pFrameBuffer->nHeight, pFrameBuffer->nWidth, CV_8UC3);
-
-                uchar *pBGRBuf = NULL;
-                pBGRBuf = new uchar[pFrameBuffer->nHeight * pFrameBuffer->nWidth * 3];
-
-                //Convert raw8(bayer) image into BGR24 image
-                VxInt32 emDXStatus = DX_OK;
-                emDXStatus = DxRaw8toRGB24((unsigned char *)pFrameBuffer->pImgBuf, pBGRBuf, pFrameBuffer->nWidth,
-                                           pFrameBuffer->nHeight,
-                                           RAW2RGB_NEIGHBOUR, DX_PIXEL_COLOR_FILTER(BAYERBG), false);  
-              if (emDXStatus != DX_OK)
-                {
-                    printf("DxRaw8toRGB24 Failed, Error Code: %d\n", emDXStatus);
-                    delete[] pBGRBuf;
-                    pBGRBuf = NULL;
-                    return 0;
-                }
-                else
-                {
-                    memcpy(src.data, pBGRBuf, pFrameBuffer->nHeight * pFrameBuffer->nWidth * 3);
-                    // producer 获取Mat图像接口
-                    {
-                        std::unique_lock<std::mutex> mutex_(mutex_pic_);
-                        is_pic_getable = false;
-                        src.copyTo(threadParam->m_pImage->mat);
-                        gettimeofday(&start, NULL);
-                        threadParam->m_pImage->timeval = start;
-//			std::cout<<start.tv_usec<<std::endl;					
-//(double) (1000000 * (start.tv_sec) + (start.tv_usec)) / 1000 - PIC_DELAY;
-                    }
-                    is_pic_getable = true;
-                    condition_pic_.notify_one();
-                    delete[] pBGRBuf;
-                    pBGRBuf = NULL;
-                }
-                emStatus = GXQBuf(threadParam->m_hDevice, pFrameBuffer);
-                if (emStatus != GX_STATUS_SUCCESS)
-                {
-                    GetErrorString(emStatus);
-                    return 0;
-                }
+                GetErrorString(emStatus);
+                return false;
             }
-            counter_.countEnd();
-//            std::cout << "FPS: " << 1000/counter_.getTimeMs() << std::endl;
-            //std::this_thread::sleep_for(std::chrono::microseconds(10000));
         }
-        //printf("<Acquisition thread Exit!>\n");
-        return 0;
+
+        if (pFrameBuffer->nStatus != GX_FRAME_STATUS_SUCCESS)
+        {
+            printf("<Abnormal Acquisition: Exception code: %d>\n", pFrameBuffer->nStatus);
+            return false;
+        }
+        else
+        {
+            if (output_frame.mat.empty())
+            {
+                output_frame.mat.create(pFrameBuffer->nHeight, pFrameBuffer->nWidth, CV_8UC3);
+            }
+            uchar *pBGRBuf = NULL;
+            pBGRBuf = new uchar[pFrameBuffer->nHeight * pFrameBuffer->nWidth * 3];
+
+            //Convert raw8(bayer) image into BGR24 image
+            VxInt32 emDXStatus = DX_OK;
+            emDXStatus = DxRaw8toRGB24((unsigned char *)pFrameBuffer->pImgBuf, pBGRBuf, pFrameBuffer->nWidth,
+                                       pFrameBuffer->nHeight,
+                                       RAW2RGB_NEIGHBOUR, DX_PIXEL_COLOR_FILTER(BAYERBG), false);
+            if (emDXStatus != DX_OK)
+            {
+                printf("DxRaw8toRGB24 Failed, Error Code: %d\n", emDXStatus);
+                delete[] pBGRBuf;
+                pBGRBuf = NULL;
+                return false;
+            }
+            else
+            {
+                memcpy(output_frame.mat.data, pBGRBuf, pFrameBuffer->nHeight * pFrameBuffer->nWidth * 3);
+                // producer 获取Mat图像接口
+                output_frame.time = clock();
+                delete[] pBGRBuf;
+                pBGRBuf = NULL;
+            }
+            emStatus = GXQBuf(threadParam->m_hDevice, pFrameBuffer);
+            if (emStatus != GX_STATUS_SUCCESS)
+            {
+                GetErrorString(emStatus);
+                return false;
+            }
+        }
+        return true;
     }
 
     //----------------------------------------------------------------------------------
@@ -626,5 +563,12 @@ namespace ly
             delete[] error_info;
             error_info = NULL;
         }
+    }
+    void GxCamera::getFrame(ly::Mat &output_frame)
+    {
+        setUpdateTime(frame_counter_.getTimeMs());
+        ProcGetImage(output_frame);
+        updateId();
+        frame_counter_.countBegin();
     }
 }

@@ -7,81 +7,31 @@
 #include "tools.h"
 #include <queue>
 #include <vector>
-#include "score.h"
+#include "node.h"
+#include "LightBarScore.h"
 #include <ctime>
-
 namespace ly
 {
-    typedef struct lightBarNode
-    {
-        /**
-         * 评价灯条的优先级的指标
-         * ---面积，在一定范围内面积越大得分越高，过大则为零
-         * ---离光心的马氏距离，从0到最大值，得分从1到0线性分布
-         * ---装甲的角度，从0到90，得分从1到0线性分布
-         * ---长宽比
-         */
-        float lengthWidthRatio = 0;                                         //长宽比,1:1--->0;6:1--->1
-        float angle = 0;                                                    //角度
-        float area = 0;                                                     //面积 200
-        float distance = 0;                                                 //离光心的像素平面上的欧式距离
-        float LWR_Ceo = 0;
-        float angle_Ceo = 0;
-        float area_Ceo = 0;
-        float distance_Ceo = 0;
-        float length = 0;
-        float width = 0;
-        int disable = 0;
-        cv::Point2f point[4] = {};
-        cv::Point2f center{};
-        float sum = 0;
-        receiveData receiveData_;
-        clock_t time{};
-        friend bool operator < (lightBarNode a, lightBarNode b)         //重载小于号
-        {
-            return a.sum < b.sum;
-        }
-        lightBarNode(){}
-    }lightBarNode;
+#define CHECK_DISTANCE 10  //控制多远的灯条视为同一个
+#define MIN_PREQUE_SCORE 1 //定义最低的前一帧图片分数
     class lightBar
     {
     public:
         lightBar() = default;
         lightBar(lightBar_param config);
         ~lightBar();
-        void init(lightBar_param config);
-        virtual std::priority_queue<lightBarNode> getLightBarQue()=0;
-        std::vector<cv::RotatedRect> getLightBar(){ return lightBars_;}
+        std::priority_queue<lightBarNode> lightBarsQue_;
+        void detect(Mat &rawPic, std::priority_queue<lightBarNode> preLBQ);
 
-        lightBarNode detect(Mat &rawPic,int colour,cv::Point2f center=cv::Point2f(0,0),int length=0,int width=0,float useROI=0);
-        void detect(Mat &rawPic,std::priority_queue<lightBarNode> preLBQ,int colour);
-
-        std::priority_queue<lightBarNode>lightBarsQue_;
-        std::priority_queue<lightBarNode>copy_lightBarsQue_;
-    protected:
-        score *LWR_Ceo_;
-        score *angle_Ceo_;
-        score *area_Ceo_;
-        score *distance_Ceo_;
-        lightBar_param config_;
-        //HSV
-        int iLowH , iLowS , iLowV , iHighH , iHighS , iHighV ;
-        std::vector<cv::RotatedRect> lightBars_;
-        std::priority_queue<lightBarNode> temp_LBQ_;
+    private:
+        LightBarScore *lightbar_score;
+        int colour;
         int thresh_;
-        cv::Point2f ROI_Pt_;
-        /*!
-         * @brief 更新lightBar
-         * @param node src
-         * @return none
-         */
-        void update_lightBar(std::priority_queue<lightBarNode> node);
+
+        lightBarNode ImageProcess(cv::Mat &rawPic, int is_use_roi = 0, cv::Point2f ROI_Pt_ = cv::Point2f(0, 0));
+        void detectByROI(Mat &rawPic, std::priority_queue<ly::lightBarNode> preLBQ);
+        void GlobalDetect(Mat &rawPic);
     };
 }
-
-
-
-
-
 
 #endif //__LIGHT_BAR_

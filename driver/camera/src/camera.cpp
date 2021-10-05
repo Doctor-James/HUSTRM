@@ -1,36 +1,17 @@
-/*
- * @Descripttion: 
- * @version: 
- * @Author: Eugene
- * @Date: 2021-07-12 20:12:13
- * @LastEditors: Andy
- * @LastEditTime: 2021-07-19 17:58:22
- */
 #include "camera.h"
-#include <iostream>
-#include "tools.h"
-#include <opencv2/opencv.hpp>
-#include <utility>
-
 namespace ly
 {
     long long int camera::frame_id_ = 0;
-
-    /**
-     * @brief 
-     * @return 
-     */
-
-    Mat picture::getFrame()
+    void picture::getFrame(ly::Mat &output_frame)
     {
         setUpdateTime(frame_counter_.getTimeMs());
         std::stringstream ss;
         //        ss<<pic_path_<<"/"<<getFrameId()<<".jpg";
         ss << pic_path_; //
-        auto pic = cv::imread(ss.str());
+        output_frame.mat = cv::imread(ss.str());
+        output_frame.time = clock();
         updateId();
         frame_counter_.countBegin();
-        return Mat();
     }
     picture::picture(std::string pic_path)
     {
@@ -41,13 +22,13 @@ namespace ly
      * @brief 获得一帧
      * @return Mat类
      */
-    Mat video::getFrame()
+    void video::getFrame(ly::Mat &output_frame)
     {
         setUpdateTime(frame_counter_.getTimeMs());
-        cap_ >> frame_.mat;
+        cap_ >> output_frame.mat;
+        output_frame.time = clock();
         updateId();
         frame_counter_.countBegin();
-        return frame_;
     }
     /**
      * @brief 视频类

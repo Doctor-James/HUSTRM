@@ -1,210 +1,78 @@
-/**
- * @file lightBar.cpp
- * @brief
- *
- */
-
 #include "lightBar.h"
-#define RGB
-//#define HSV
-//#define HSV_DEBUG_
 namespace ly
 {
+#define FEATURE_NUM 4
     lightBar::lightBar(lightBar_param config)
     {
-        init(config);
-    }
-    void lightBar::init(lightBar_param config)
-    {
-        config_ = std::move(config);
-        LWR_Ceo_ = new score(config_.lengthWidthRadio);
-        angle_Ceo_ = new score(config_.angle);
-        area_Ceo_ = new score(config_.area);
-        distance_Ceo_ = new score(config_.distance);
-        thresh_ = config_.thresh;
-        ROI_Pt_ = cv::Point2f(0,0);
-        iLowH = 0, iLowS = 233, iLowV = 233, iHighH = 10, iHighS = 255, iHighV = 255;
+        thresh_ = config.thresh;
+        colour = config.color;
+        lightbar_score = new LightBarScore(config);
     }
     lightBar::~lightBar()
     {
-        delete(LWR_Ceo_);
-        delete(angle_Ceo_);
-        delete(area_Ceo_);
-        delete(distance_Ceo_);
+        delete lightbar_score;
     }
-    void lightBar::detect(Mat &rawPic, std::priority_queue<ly::lightBarNode> preLBQ,int colour)
+    void lightBar::detect(Mat &rawPic, std::priority_queue<ly::lightBarNode> preLBQ) //灯条线程处理函数
     {
-        if(rawPic.mat.empty())                              //原始图像为空就返回
-            return;
-        std::priority_queue<lightBarNode> temp_lightBars;
-        ly::lightBarNode last_lightBar;                     //
-        last_lightBar.center = cv::Point2f(0,0);
-        if(preLBQ.empty()||preLBQ.top().sum<1.5)            //没有前一帧的检测数据或前一帧的检测数据很差
+        if (preLBQ.empty() || preLBQ.top().sum < MIN_PREQUE_SCORE) //没有前一帧的检测数据或前一帧的检测数据很差
         {
-            detect(rawPic,colour);                                 //全图检测
-            temp_lightBars = temp_LBQ_;
-            update_lightBar(temp_lightBars);
-            //std::cout<<"no ROI"<<std::endl;
-            return;
+            GlobalDetect(rawPic);
         }
-        else{                                               //先前帧有合适的roi
-            int times = preLBQ.size()>5?5:(int)preLBQ.size();
-
-            for(int i=0;i<times;i++)
-            {
-                auto length = (int)(preLBQ.top().length);
-                auto width = (int)(preLBQ.top().width);
-                auto useROI = (int)2;
-                float distance = (preLBQ.top().center.x - last_lightBar.center.x)*(preLBQ.top().center.x - last_lightBar.center.x)+
-                                 (preLBQ.top().center.y - last_lightBar.center.y)*(preLBQ.top().center.y - last_lightBar.center.y);
-                if(distance<10)                             //两帧检测到的灯条位置接近，看成一个灯条
-                {
-                    preLBQ.pop();
-                }
-                last_lightBar = preLBQ.top();
-                temp_lightBars.push(detect(rawPic,colour,preLBQ.top().center,width,length,useROI));
-                preLBQ.pop();
-            }
-            update_lightBar(temp_lightBars);
+        else
+        {
+            detectByROI(rawPic, preLBQ);
         }
     }
-    void lightBar::update_lightBar(const std::priority_queue<lightBarNode> node)
+    void lightBar::GlobalDetect(Mat &rawPic)
     {
-        lightBarsQue_ = node;
+        while (!lightBarsQue_.empty())
+        {
+            lightBarsQue_.pop();
+        }
+        ImageProcess(rawPic.mat);
     }
-
-    lightBarNode lightBar::detect(Mat &rawPic,int colour,cv::Point2f center, int length, int width, float useROI)
+    lightBarNode lightBar::ImageProcess(cv::Mat &rawPic, int is_use_roi, cv::Point2f ROI_Pt_)
     {
-        cv::Mat ROI;
-
-        if (rawPic.mat.empty())                                 //原图为空
-        {
-            std::cerr << "detect rawPic.empty()" << std::endl;
-            return temp_LBQ_.top();
-        }
-
-
-        if(useROI > 1 && width > 0 && length > 0)               //放大倍数大于1就计算ROI
-        {
-            // 计算出roi的左上角坐标，放入ROI_PT_中
-            float roi_left_x = (center.x-length/2.0f*useROI)<1?1:(center.x-length/2.0f*useROI);
-            float roi_left_y = (center.y-width/2.0f*useROI)<1?1:(center.y-width/2.0f*useROI);
-            // ROI_Pt 左上角点坐标
-            ROI_Pt_ = cv::Point2f(roi_left_x,roi_left_y);
-            // 计算ROI的宽高，并作边界检查
-            length = (int)(length*useROI+ROI_Pt_.x)>rawPic.mat.cols?rawPic.mat.cols:(int)(length*useROI+ROI_Pt_.x);
-            width = (int)(width*useROI+ROI_Pt_.y)>rawPic.mat.rows?rawPic.mat.rows:(int)(width*useROI+ROI_Pt_.y);
-            // 将ROI取出放入rawPic.mat
-            ROI = rawPic.mat(cv::Range((int)ROI_Pt_.y,width),cv::Range((int)ROI_Pt_.x,length));
-        }
-        else                                                 //不使用ROI，全图作为roi
-        {
-            ROI_Pt_ = cv::Point2f(0,0);
-            ROI = rawPic.mat;
-        }
-
-#ifdef RGB
-        cv::Mat subtract_dst;                           //红蓝通道相减得到的图
-        cv::Mat thresh;                                 //二值化后的单通道图像
-        std::vector<cv::Mat> rgb_vec;                   //三通道的颜色向量
-        std::vector<std::vector<cv::Point> > contours;  //轮廓点集
-        time lightBar_time;                             //计时器
-
-        lightBar_time.countBegin();
-
-        if(colour == 1)                     //需要检测蓝色装甲
-        {
-            cv::split(ROI,rgb_vec);
-            cv::subtract(rgb_vec[0], rgb_vec[2], subtract_dst);
-            cv::threshold(subtract_dst, thresh, thresh_, 255, cv::THRESH_BINARY );      //thresh_在config里面配置
-        }
-        else if (colour == 0)                //需要检测红色装甲
-        {
-            cv::split(ROI,rgb_vec);
-            cv::subtract(rgb_vec[2], rgb_vec[0], subtract_dst);
-            cv::threshold(subtract_dst, thresh, thresh_, 255, cv::THRESH_BINARY );
-        }
-#endif
-
-#ifdef HSV_DEBUG_
-        cv::Mat imgHSVDebug;                           //红蓝通道相减得到的图
-        cv::Mat threshDebug;                                 //二值化后的单通道图像
-        cv::Mat element;
-        cv::cvtColor(rawPic.mat, imgHSVDebug, cv::COLOR_BGR2HSV); //BGR转换为HSV空间
-        std::vector<cv::Mat> hsvSplitDebug;
-        cv::split(imgHSVDebug, hsvSplitDebug);
-        cv::equalizeHist(hsvSplitDebug[2], hsvSplitDebug[2]);
-        cv::merge(hsvSplitDebug, imgHSVDebug);
-        inRange(imgHSVDebug, cv::Scalar(iLowH, iLowS, iLowV), cv::Scalar(iHighH, iHighS, iHighV), threshDebug); //Threshold the image
-
-        element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
-        //dilate(imgThresholded,imgThresholded,element);
-        cv::morphologyEx(threshDebug, threshDebug, cv::MORPH_OPEN, element);  //开操作
-        cv::namedWindow("imgThresholded",1);
-        cv::createTrackbar( "iLowH : ","imgThresholded", &iLowH, 255, NULL);
-        cv::createTrackbar( "iLowS : ","imgThresholded", &iLowS, 255, NULL);
-        cv::createTrackbar( "iLowV : ","imgThresholded", &iLowV, 255, NULL);
-        cv::createTrackbar( "iHighH : ","imgThresholded", &iHighH, 255, NULL);
-        cv::createTrackbar( "iHighS : ","imgThresholded", &iHighS, 255, NULL);
-        cv::createTrackbar( "iHighV : ","imgThresholded", &iHighV, 255, NULL);
-        imshow("imgThresholded",threshDebug);
-        cv::waitKey(10);
-
-#endif
-
-#ifdef HSV
-        cv::Mat imgHSV;                           //红蓝通道相减得到的图
-        cv::Mat thresh;                                 //二值化后的单通道图像
-        std::vector<std::vector<cv::Point> > contours;  //轮廓点集
-
-        cv::cvtColor(ROI, imgHSV, cv::COLOR_BGR2HSV); //BGR转换为HSV空间
-        std::vector<cv::Mat> hsvSplit;
-        cv::split(imgHSV, hsvSplit);
-        cv::equalizeHist(hsvSplit[2], hsvSplit[2]);
-        cv::merge(hsvSplit, imgHSV);
-        inRange(imgHSV, cv::Scalar(iLowH, iLowS, iLowV), cv::Scalar(iHighH, iHighS, iHighV), thresh); //Threshold the image
-
-#endif
-//        cv::imshow("thresh", thresh);
-//        static int i = 1;
-//        if(i < 1000){
-//            i++;
-//        }
-//        else{
-//            cv::imwrite("../thresh.jpg", thresh);
-//        }
-        cv::findContours(thresh, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE); //查找图像轮廓
-
-        std::vector<cv::RotatedRect> possibleLightBars(contours.size());
-
-        // 清空lightBar_和temp_LBQ
-        lightBars_.clear();
-        while(!temp_LBQ_.empty())
-        {
-            temp_LBQ_.pop();
-        }
-
-        if(contours.size()<2 && useROI<=1)                                  // 没有识别到灯条的情况，返回一个空的lightBarNode
+        std::priority_queue<ly::lightBarNode> temp_lightBarQue_;
+        if (rawPic.empty())
         {
             return lightBarNode();
         }
+        cv::Mat subtract_dst;         //红蓝通道相减得到的图
+        cv::Mat thresh;               //二值化后的单通道图像
+        std::vector<cv::Mat> rgb_vec; //三通道的颜色向量
+        if (colour == 1)              //需要检测蓝色装甲
+        {
+            cv::split(rawPic, rgb_vec);
+            cv::subtract(rgb_vec[0], rgb_vec[2], subtract_dst);
+            cv::inRange(subtract_dst, thresh_, 255, thresh); //thresh_在config里面配置
+        }
 
-        for (unsigned int j = 0; j < contours.size(); ++j)                  // 遍历每一个轮廓，找到最小矩形框
+        else if (colour == 0) //需要检测红色装甲
+        {
+            cv::split(rawPic, rgb_vec);
+            cv::subtract(rgb_vec[2], rgb_vec[0], subtract_dst);
+            cv::inRange(subtract_dst, thresh_, 255, thresh);
+        }
+        std::vector<std::vector<cv::Point>> contours;
+        cv::findContours(thresh, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE); //查找图像轮廓
+        if (contours.size() < 2)                                                        // 没有识别到灯条的情况，返回一个空的lightBarNode
+        {
+            return lightBarNode();
+        }
+        std::vector<cv::RotatedRect> possibleLightBars(contours.size());
+        for (unsigned int j = 0; j < contours.size(); ++j) // 遍历每一个轮廓，找到最小矩形框
         {
             lightBarNode node;
             cv::Point2f point[4];
             possibleLightBars.at(j) = cv::minAreaRect(contours[j]);
-
-            //------------test----------------
             bool is_get_angle = false;
             cv::RotatedRect tmp_Elli;
-            if(contours[j].size()>6)                                        // fitEllipse要求点集最少有6个点
+            if (contours[j].size() > 6) // fitEllipse要求点集最少有6个点
             {
-                tmp_Elli=cv::fitEllipse(contours[j]);                       // 返回拟合后的椭圆
-//                | -90
-//                | 0
-//                | 90
-                if(tmp_Elli.angle<90)
+                tmp_Elli = cv::fitEllipse(contours[j]); // 返回拟合后的椭圆
+                //0-360度转为-90-90度
+                if (tmp_Elli.angle < 90)
                 {
                     tmp_Elli.angle = -tmp_Elli.angle;
                 }
@@ -215,9 +83,9 @@ namespace ly
                 is_get_angle = true;
             }
 
-            if(possibleLightBars.at(j).size.height > possibleLightBars.at(j).size.width)
+            if (possibleLightBars.at(j).size.height > possibleLightBars.at(j).size.width)
             {
-                if(is_get_angle)
+                if (is_get_angle)
                 {
                     node.angle = tmp_Elli.angle;
                 }
@@ -228,60 +96,96 @@ namespace ly
                 node.length = possibleLightBars.at(j).size.height;
                 node.width = possibleLightBars.at(j).size.width;
                 possibleLightBars.at(j).points(point);
-                node.point[0]=point[0] + ROI_Pt_;
-                node.point[1]=point[3] + ROI_Pt_; //3->1
-                node.point[2]=point[2] + ROI_Pt_;
-                node.point[3]=point[1] + ROI_Pt_; //1->3
+                node.point[0] = point[0] + ROI_Pt_;
+                node.point[1] = point[3] + ROI_Pt_; //3->1
+                node.point[2] = point[2] + ROI_Pt_;
+                node.point[3] = point[1] + ROI_Pt_; //1->3
             }
             else
             {
-                if(is_get_angle)
+                if (is_get_angle)
                 {
                     node.angle = tmp_Elli.angle;
                 }
                 else
                 {
-                    node.angle = -possibleLightBars.at(j).angle-90;
+                    node.angle = -possibleLightBars.at(j).angle - 90;
                 }
                 node.length = possibleLightBars.at(j).size.width;
                 node.width = possibleLightBars.at(j).size.height;
                 possibleLightBars.at(j).points(node.point);
-                for(int k=0;k<4;k++)
+                for (int k = 0; k < 4; k++)
                 {
-                    node.point[k]=node.point[k]+ROI_Pt_;
+                    node.point[k] = node.point[k] + ROI_Pt_;
                 }
             }
             possibleLightBars.at(j).center += ROI_Pt_;
-
             //计算lightbar到图像中心的距离和lightbar的面积
-            node.distance = std::sqrt((possibleLightBars.at(j).center.x-rawPic.mat.rows/2)*(possibleLightBars.at(j).center.x-rawPic.mat.rows/2)
-                                      + (possibleLightBars.at(j).center.y-rawPic.mat.cols/2)*(possibleLightBars.at(j).center.y-rawPic.mat.cols/2));
+            node.distance = std::sqrt((possibleLightBars.at(j).center.x - rawPic.rows / 2) * (possibleLightBars.at(j).center.x - rawPic.rows / 2) + (possibleLightBars.at(j).center.y - rawPic.cols / 2) * (possibleLightBars.at(j).center.y - rawPic.cols / 2));
             node.area = possibleLightBars.at(j).size.area();
-
-            //计算长宽比
-            if(node.width == 0)
+            if (node.width == 0)
             {
                 node.lengthWidthRatio = 0;
             }
             else
             {
-                node.lengthWidthRatio = node.length/node.width;
+                node.lengthWidthRatio = node.length / node.width;
             }
             node.center = possibleLightBars.at(j).center;
-            node.angle_Ceo = (float)angle_Ceo_->getScore(node.angle);
-            node.area_Ceo = (float)area_Ceo_->getScore(node.area);
-            node.LWR_Ceo = (float)LWR_Ceo_->getScore(node.lengthWidthRatio);
-            node.receiveData_ = rawPic.receiveData_;
-            node.distance_Ceo = (float)distance_Ceo_->getScore((double)node.distance);
-
-            node.sum = node.angle_Ceo + node.LWR_Ceo + node.area_Ceo + node.distance_Ceo;       //计算node的分数
-            if(node.disable == 0)
+            lightbar_score->getLightBarScore(node);
+            //这里缺少了一个对灯条判断的条件
+            if (node.disable == 0)
             {
-                temp_LBQ_.push(node);
+                temp_lightBarQue_.push(node);
             }
         }
-        return temp_LBQ_.empty() ? lightBarNode() : temp_LBQ_.top();
+        if (is_use_roi == 0)
+        {
+            std::cout << "global" << std::endl;
+            lightBarsQue_ = temp_lightBarQue_;
+        }
+        else
+        {
+            std::cout << "roi" << std::endl;
+            return temp_lightBarQue_.top();
+        }
+    }
+    //根据ROI或者全局检测灯条（1个），返回最优灯条或空灯条
+    void lightBar::detectByROI(Mat &rawPic, std::priority_queue<ly::lightBarNode> preLBQ)
+    {
+        if (rawPic.mat.empty()) //原图为空
+        {
+            std::cerr << "detect rawPic.empty()" << std::endl;
+            return;
+        }
+        while (!lightBarsQue_.empty())
+        {
+            lightBarsQue_.pop();
+        }
+        cv::Point2f lastCenter = cv::Point2f(0, 0);
+        int times = preLBQ.size() > 5 ? 5 : (int)preLBQ.size();
+        for (int i = 0; i < times; i++)
+        {
+            auto length = (int)(preLBQ.top().length);
+            auto width = (int)(preLBQ.top().width);
+            auto useROI = (int)2;
+            float distance = (preLBQ.top().center.x - lastCenter.x) * (preLBQ.top().center.x - lastCenter.x) +
+                             (preLBQ.top().center.y - lastCenter.y) * (preLBQ.top().center.y - lastCenter.y);
+            cv::Point2f center = preLBQ.top().center;
+            if (distance < CHECK_DISTANCE) //两帧检测到的灯条位置接近，看成一个灯条
+            {
+                preLBQ.pop();
+                continue;
+            }
+            float roi_left_x = (center.x - length / 2.0f * useROI) < 1 ? 1 : (center.x - length / 2.0f * useROI);
+            float roi_left_y = (center.y - width / 2.0f * useROI) < 1 ? 1 : (center.y - width / 2.0f * useROI);
+            cv::Point2f ROI_Pt_ = cv::Point2f(roi_left_x, roi_left_y);
+            length = (int)(length * useROI + ROI_Pt_.x) > rawPic.mat.cols ? rawPic.mat.cols : (int)(length * useROI + ROI_Pt_.x);
+            width = (int)(width * useROI + ROI_Pt_.y) > rawPic.mat.rows ? rawPic.mat.rows : (int)(width * useROI + ROI_Pt_.y);
+            cv::Mat ROI = rawPic.mat(cv::Range((int)ROI_Pt_.y, width), cv::Range((int)ROI_Pt_.x, length));
+            lastCenter = preLBQ.top().center;
+            lightBarsQue_.push(ImageProcess(ROI, 1, ROI_Pt_));
+            preLBQ.pop();
+        }
     }
 }
-
-

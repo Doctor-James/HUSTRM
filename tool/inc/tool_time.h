@@ -2,14 +2,16 @@
 #define __TOOL_TIME_H
 
 #include "sys/time.h"
-
-namespace ly{
+#include <iostream>
+namespace ly
+{
     class time
     {
     private:
-        double countMs;//ms
+        double countMs; //ms
         struct timeval start, end;
         int startFlag = 0;
+
     public:
         void countBegin();
         double countEnd();

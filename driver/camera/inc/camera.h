@@ -1,17 +1,10 @@
-/*
- * @Descripttion: 
- * @version: 
- * @Author: Eugene
- * @Date: 2021-07-12 20:12:13
- * @LastEditors: Andy
- * @LastEditTime: 2021-07-20 11:59:47
- */
-
 #ifndef __CAMERA__H
 #define __CAMERA__H
 
 #include "tools.h"
 #include <opencv2/opencv.hpp>
+#include <iostream>
+#include <utility>
 
 enum type
 {
@@ -27,16 +20,14 @@ namespace ly
     public:
         camera() = default;
         ~camera() = default;
-        virtual Mat getFrame() = 0; //获取灯条处理的图片
-        //virtual Mat getFrame2() {}  //获取装甲分类的图片
-        virtual int getType() = 0;  //获取相机类型
+        virtual void getFrame(ly::Mat &output_frame) = 0; //获取灯条处理的图片
+        virtual int getType() = 0;                        //获取相机类型
 
         virtual inline double getUpdateTime() { return update_time_; }
         virtual inline int getFrameId() { return frame_id_; }
         inline void updateId() { frame_id_++; }
         inline void setUpdateTime(double time) { update_time_ = time; }
-        Mat frame_; //用于灯条的识别
-        //Mat frame2_;         //用于装甲的识别
+        Mat frame_;          //用于灯条的识别
         time frame_counter_; //计时器
 
     private:
@@ -50,7 +41,7 @@ namespace ly
     public:
         video() = default;
         explicit video(const std::string &video_path);
-        Mat getFrame() override;
+        void getFrame(ly::Mat &output_frame) override;
         int getType() override { return VIDEO; }
 
     private:
@@ -61,7 +52,7 @@ namespace ly
     public:
         picture() = default;
         explicit picture(std::string pic_path);
-        Mat getFrame() override;
+        void getFrame(ly::Mat &output_frame) override;
         int getType() override { return PIC; }
 
     private:

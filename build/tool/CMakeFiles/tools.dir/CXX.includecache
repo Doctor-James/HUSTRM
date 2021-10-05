@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../tool/inc/tool_config.h
+jsoncpp/json/json.h
+../tool/inc/jsoncpp/json/json.h
+string
+-
+memory
+-
+fstream
+-
+iostream
+-
+
+../tool/inc/tool_log.h
+glog/logging.h
+../tool/inc/glog/logging.h
+
+../tool/inc/tool_time.h
+sys/time.h
+../tool/inc/sys/time.h
+iostream
+-
+
+/home/zhou/RM/RM2022/AIM_RM/tool/src/tool_config.cpp
+tool_config.h
+/home/zhou/RM/RM2022/AIM_RM/tool/src/tool_config.h
+
+/home/zhou/RM/RM2022/AIM_RM/tool/src/tool_log.cpp
+tool_log.h
+/home/zhou/RM/RM2022/AIM_RM/tool/src/tool_log.h
+
+/home/zhou/RM/RM2022/AIM_RM/tool/src/tool_time.cpp
+tool_time.h
+/home/zhou/RM/RM2022/AIM_RM/tool/src/tool_time.h
+

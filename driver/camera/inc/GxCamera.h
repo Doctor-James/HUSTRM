@@ -19,14 +19,14 @@
 #include "tools.h"
 #include <cstring>
 #include <malloc.h>
+#include "camera.h"
+#include <stdlib.h>
 
 #define ACQ_BUFFER_NUM 5              ///< Acquisition Buffer Qty.
 #define ACQ_TRANSFER_SIZE (64 * 1024) ///< Size of data transfer block
 #define ACQ_TRANSFER_NUMBER_URB 64    ///< Qty. of data transfer block
 namespace ly
 {
-
-
     void GetErrorString(GX_STATUS emErrorStatus);
 
     void *ProcGetImage(void *pAcquisitionThread);
@@ -87,7 +87,7 @@ namespace ly
     } Roi;
 
     /// Exposure and Gain Param struct
-    typedef struct ExposureGainTrigger
+    typedef struct ExposureGain
     {
 
         bool m_bAutoExposure; ///< Exposure is auto mode or not
@@ -102,9 +102,9 @@ namespace ly
         double m_dAutoGainMin; ///< Minimum gain when using AutoGain mode
 
         int64_t m_i64GrayValue; ///< Expected gray value
-        bool TRIGGER_SOURCE_LINE2;
+
         ///Default value
-        ExposureGainTrigger()
+        ExposureGain()
         {
             m_bAutoExposure = true; ///< Exposure is auto mode or not
             m_bAutoGain = true;     ///< Gain is auto mode or not
@@ -118,9 +118,8 @@ namespace ly
             m_dAutoGainMin = 5;  ///< Minimum gain when using AutoGain mode
 
             m_i64GrayValue = 200; ///< Expected gray value
-            TRIGGER_SOURCE_LINE2 = true;
         }
-    } ExposureGainTrigger;
+    } ExposureGain;
 
     /// WhiteBalance
     typedef struct WhiteBalance
@@ -134,15 +133,20 @@ namespace ly
         }
     } WhiteBalance;
 
-    class GxCamera
+    class GxCamera : public camera
     {
-        //friend void *ProcGetImage(void* pMatImage);
-
     public:
         GxCamera();
 
         ~GxCamera();
 
+        char *get_deviceSN() { return g_pDeviceSN; }
+
+        void getFrame(ly::Mat &output_frame) override;
+
+        int getType() override { return DAH_CAM; }
+
+    private:
         /// Initialize libary
         GX_STATUS initLib();
 
@@ -154,7 +158,7 @@ namespace ly
 
         GX_STATUS acquisitionEnd();
 
-        void *ProcGetImage(void *pAcquisitionThread);
+        GX_STATUS ProcGetImage(ly::Mat &output_frame);
 
         /// Set camera exposure and gain
         void
@@ -166,8 +170,7 @@ namespace ly
                              double Gain,
                              double AutoGainMin,
                              double AutoGainMax,
-                             int64_t GrayValue,
-                             bool TRIGGER_SOURCE_LINE2);
+                             int64_t GrayValue);
 
         /// Set camera roi param
         void setRoiParam(int64_t Width,
@@ -178,18 +181,11 @@ namespace ly
         /// Set camera WhiteBalance
         void setWhiteBalanceParam(bool WhiteBalanceOn,
                                   GX_AWB_LAMP_HOUSE_ENTRY lightSource);
-        AcquisitionThread *getparam()
-        {
-            return &threadParam;
-        }
-        char *get_deviceSN() { return g_pDeviceSN; }
-
-    private:
         /// Set camera roi param
         GX_STATUS setRoi();
 
         /// Set camera exposure and gain
-        GX_STATUS setExposureGainTrigger();
+        GX_STATUS setExposureGain();
 
         /// Set camera WhiteBalance
         GX_STATUS setWhiteBalance();
@@ -209,11 +205,15 @@ namespace ly
         bool g_bWhiteBalance;    ///< WhiteBalance support flag
         bool g_bAcquisitionFlag; ///< Thread running flag
 
-        AcquisitionThread threadParam;
-        ExposureGainTrigger exposure_gain_trigger; ///< Camera exposure and gain param
+        AcquisitionThread *threadParam;
+        ExposureGain exposure_gain; ///< Camera exposure and gain param
         Roi roi;                    ///< Camera roi and resolution param
         WhiteBalance white_balance; ///< Camera whitebalance param
-	time counter_;
+        time counter_;
+        GX_STATUS emStatus = GX_STATUS_SUCCESS;
+        //Thread running flag setup
+        PGX_FRAME_BUFFER pFrameBuffer = NULL;
+        uint32_t ui32FrameCount = 0;
     };
 }
 

@@ -4,22 +4,24 @@
  * @author lyc
  */
 #include "tool_config.h"
-#include <fstream>
-#include <iostream>
-namespace ly{
+namespace ly
+{
     config::config()
-    {//read all config data
-        std::fstream file(path_,std::ios::in);
-        if(!file.is_open())
+    { //read all config data
+        std::fstream file(path_, std::ios::in);
+        if (!file.is_open())
         {
-            std::cerr<<"can not open "<<"path:"<<path_<<std::endl;
+            std::cerr << "can not open "
+                      << "path:" << path_ << std::endl;
         }
         JSONCPP_STRING errs;
         bool status = Json::parseFromStream(builder, file, &root, &errs);
-        if(!status){
-            std::cerr<<"parse error !!!"<<std::endl;
+        if (!status)
+        {
+            std::cerr << "parse error !!!" << std::endl;
         }
-        else {
+        else
+        {
             /***********cam_device************/
             configDataSt_.camDevice.deviceType = root["cam_device"]["deviceType"].asInt();
             configDataSt_.camDevice.sn = root["cam_device"]["sn"].asString();
@@ -47,8 +49,7 @@ namespace ly{
             configDataSt_.robotParam.gimbal_cam[2] = root["robot_param"]["gimbal_cam"]["dz"].asDouble();
             /***********lightBar_param************/
             configDataSt_.lightBarParam.thresh = root["lightBar_param"]["thresh"].asInt();
-            configDataSt_.lightBarParam.gamma = root["lightBar_param"]["gamma"].asFloat();
-            configDataSt_.lightBarParam.color = root["lightBar_param"]["color"].asString();
+            configDataSt_.lightBarParam.color = root["lightBar_param"]["color"].asInt();
             configDataSt_.lightBarParam.lengthWidthRadio = getParam("lightBar_param", "lengthWidthRadio");
             configDataSt_.lightBarParam.angle = getParam("lightBar_param", "angle");
             configDataSt_.lightBarParam.area = getParam("lightBar_param", "area");
@@ -85,35 +86,33 @@ namespace ly{
             configDataSt_.largeArmorParam.LBR_w = root["large_armor_param"]["LBR_w"].asDouble();
             configDataSt_.largeArmorParam.lastCenter_w = root["large_armor_param"]["lastCenter_w"].asDouble();
             configDataSt_.largeArmorParam.hp_w = root["large_armor_param"]["hp_w"].asDouble();
-//            /***********weights****************/
-//            configDataSt_.weightsParam.LWR_ceo = root["weights_param"]["LWR_ceo"].asDouble();
-//            configDataSt_.weightsParam.angle_ceo = root["weights_param"]["angle_ceo"].asDouble();
-//            configDataSt_.weightsParam.area_ceo = root["weights_param"]["area_ceo"].asDouble();
-//            configDataSt_.weightsParam.distance_ceo = root["weights_param"]["distance_ceo"].asDouble();
-//            configDataSt_.weightsParam.parallelism_ceo = root["weights_param"]["parallelism_ceo"].asDouble();
-//            configDataSt_.weightsParam.lightBar_ceo = root["weights_param"]["lightBar_ceo"].asDouble();
-//            configDataSt_.weightsParam.LBR_ceo = root["weights_param"]["LBR_ceo"].asDouble();
-//            configDataSt_.weightsParam.lastCenter_ceo = root["weights_param"]["lastCenter_ceo"].asDouble();
+            //            /***********weights****************/
+            //            configDataSt_.weightsParam.LWR_ceo = root["weights_param"]["LWR_ceo"].asDouble();
+            //            configDataSt_.weightsParam.angle_ceo = root["weights_param"]["angle_ceo"].asDouble();
+            //            configDataSt_.weightsParam.area_ceo = root["weights_param"]["area_ceo"].asDouble();
+            //            configDataSt_.weightsParam.distance_ceo = root["weights_param"]["distance_ceo"].asDouble();
+            //            configDataSt_.weightsParam.parallelism_ceo = root["weights_param"]["parallelism_ceo"].asDouble();
+            //            configDataSt_.weightsParam.lightBar_ceo = root["weights_param"]["lightBar_ceo"].asDouble();
+            //            configDataSt_.weightsParam.LBR_ceo = root["weights_param"]["LBR_ceo"].asDouble();
+            //            configDataSt_.weightsParam.lastCenter_ceo = root["weights_param"]["lastCenter_ceo"].asDouble();
         }
         file.close();
     }
-    param config::getParam(const std::string& paramName1,const std::string& paramName2)
+    param config::getParam(const std::string &paramName1, const std::string &paramName2)
     {
         param temp;
-        temp.enable = root[paramName1][paramName2]["enable"].asBool();;
-        temp.best = root[paramName1][paramName2]["best"].asDouble();;
-        temp.min = root[paramName1][paramName2]["min"].asDouble();;
-        temp.max = root[paramName1][paramName2]["max"].asDouble();;
-        temp.left_ceo = root[paramName1][paramName2]["left_ceo"].asDouble();;
-        temp.right_ceo = root[paramName1][paramName2]["right_ceo"].asDouble();;
+        temp.enable = root[paramName1][paramName2]["enable"].asBool();
+        ;
+        temp.best = root[paramName1][paramName2]["best"].asDouble();
+        ;
+        temp.min = root[paramName1][paramName2]["min"].asDouble();
+        ;
+        temp.max = root[paramName1][paramName2]["max"].asDouble();
+        ;
+        temp.left_ceo = root[paramName1][paramName2]["left_ceo"].asDouble();
+        ;
+        temp.right_ceo = root[paramName1][paramName2]["right_ceo"].asDouble();
+        ;
         return temp;
     }
 }
-
-
-
-
-
-
-
-

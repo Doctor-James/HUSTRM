@@ -3,17 +3,14 @@ include_directories(
         /usr/local/include/glog
         /lib/config/include/json
 )
-
+aux_source_directory(src TOOL_CPP)
 add_library(
         tools
-        src/tool_config.cpp
-        src/tool_log.cpp
-        src/tool_time.cpp
-		src/tool_Drawcurve.cpp
+        ${TOOL_CPP}
 )
 target_link_libraries(
         tools
-        /usr/local/lib/libglog.so
-        /usr/local/lib/libjson.a
-//	/usr/local/lib/libjsoncpp.so
+        /usr/local/lib/libglog.a
+        /usr/lib/x86_64-linux-gnu/libjson-c.a
+        jsoncpp
 )

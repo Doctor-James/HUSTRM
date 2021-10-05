@@ -21,8 +21,8 @@
  }
  */
 #include "tool_time.h"
-#include <iostream>
-namespace ly{
+namespace ly
+{
     void time::countBegin()
     {
         gettimeofday(&start, NULL);
@@ -31,15 +31,15 @@ namespace ly{
     double time::countEnd()
     {
         gettimeofday(&end, NULL);
-        if(startFlag == 1)
+        if (startFlag == 1)
         {
-            countMs = (double) (1000000 * (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec)) / 1000;
+            countMs = (double)(1000000 * (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec)) / 1000;
             startFlag = 0;
             return countMs;
         }
         else
         {
-            std::cerr<<"try to count time without begin !!!!!"<<std::endl;
+            std::cerr << "try to count time without begin !!!!!" << std::endl;
             return -1;
         }
     }
@@ -48,4 +48,3 @@ namespace ly{
         return countMs;
     }
 }
-

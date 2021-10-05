@@ -2,37 +2,30 @@
 #define __SERIAL_READ_PORT_THREAD_H
 
 #include "serialPort.h"
-#include <mutex>
-#include <thread>
 #include "tools.h"
 #include "thread.h"
-
+#include <iostream>
+#include <utility>
+#include "tool_log.h"
 namespace ly
 {
     // 串口设备的接收接口类
-    class serialPortReadThread:public serialPort,public thread
+    class serialPortReadThread : public thread
     {
     public:
         serialPortReadThread() = default;
-        explicit serialPortReadThread(const serialPort_dev& config);
+        explicit serialPortReadThread(const serialPort_dev &config);
         ~serialPortReadThread();
-        std::vector<receiveData> getReceiveMsg();
+
     private:
-        unsigned char temptemp[2*14];
-        unsigned char temp[14];
-        int max_receive_len_ = 14;
-        unsigned char read_data_[14];
+        serialPort *read_;
+        unsigned char temptemp[2 * 10];
+        unsigned char temp[10];
+        int max_receive_len_ = 10;
+        unsigned char read_data_[10];
         receiveData stm32;
         void process() override;
         void readData();
-
-
-        bool BeginTime_Flag = false;
-        int MCU_BeginTime;
-        struct timeval Tx2_BeginTime_;
-        int outrange_times = 0;
-        time counter_;
-	int last_time;
     };
 }
 #endif //__SERIAL_PORT_THREAD_H
