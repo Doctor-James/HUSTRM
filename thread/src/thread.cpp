@@ -1,7 +1,7 @@
 #include "thread.h"
 namespace ly
 {
-    std::shared_ptr<SharedData> thread::share_ = std::shared_ptr<SharedData>(new SharedData());
+    std::shared_ptr<SharedData> thread::share_ = std::make_shared<SharedData>();
     void thread::start(int delay)
     {
         delay_ = delay;

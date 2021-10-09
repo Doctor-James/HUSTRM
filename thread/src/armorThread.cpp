@@ -8,7 +8,7 @@ namespace ly
         score_ = new score();
         pnp_ = new solvePNP(cam_config);
         small_armor = new armor(config);
-        start(15000);
+        start(10000);
     }
 
     armorThread::~armorThread()

@@ -26,7 +26,7 @@ namespace ly
             break;
         case VIDEO:
             cam_ = new video(config.videoPath);
-            start(5000); //100帧相机
+            start(7000); //100帧相机
             break;
         default:
             break;
@@ -37,10 +37,11 @@ namespace ly
      */
     void cameraThread::process() //生产者
     {
+        // Mat frame_;
         cam_->getFrame(this->frame_);
+        // counter_.countBegin();
         share_->setPic(this->frame_);
         // counter_.countEnd();
         // std::cout << counter_.getTimeMs() << std::endl;
-        // counter_.countBegin();
     }
 }

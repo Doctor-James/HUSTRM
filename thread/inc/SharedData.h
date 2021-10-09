@@ -10,6 +10,7 @@
 #include <thread>
 #define PHOTO_HEIGHT 1024
 #define PHOTO_WIDTH 1280
+#include "LockFreeQueue.hpp"
 namespace ly
 {
     class SharedData
@@ -38,6 +39,8 @@ namespace ly
         std::priority_queue<armorNode> armorQue_;
         std::vector<ly::receiveData> receiveData_;
         sendData sendData_;
+        LockFreeQueue<ly::Mat> my_pic_queue;
+        LockFreeQueue<std::priority_queue<lightBarNode>> my_lightBar_queue;
 
     public:
         SharedData();

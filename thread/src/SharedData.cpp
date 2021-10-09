@@ -14,43 +14,58 @@ namespace ly
     }
     void SharedData::setPic(Mat &input_frame) //生产图片
     {
-        {
-            std::unique_lock<std::mutex> mutex_(mutex_pic_);
-            is_pic_getable = false;
-            frame_.mat = input_frame.mat.clone();
-            frame_.time = clock();
-        }
-        is_pic_getable = true;
-        condition_pic_.notify_one();
+        // {
+        //     std::unique_lock<std::mutex> mutex_(mutex_pic_);
+        //     is_pic_getable = false;
+        //     frame_.mat = input_frame.mat.clone();
+        //     frame_.time = clock();
+        // }
+        // is_pic_getable = true;
+        // condition_pic_.notify_one();
+        // pic_queue.push(input_frame);
+        my_pic_queue.push(input_frame);
     }
     void SharedData::getPic(Mat &output_frame)
     {
-        std::unique_lock<std::mutex> mutex_(mutex_pic_);
-        condition_pic_.wait(mutex_, []()
-                            { return is_pic_getable; });
-        output_frame.mat = frame_.mat.clone();
-        output_frame.time = frame_.time;
-        is_pic_getable = false;
+        // std::unique_lock<std::mutex> mutex_(mutex_pic_);
+        // condition_pic_.wait(mutex_, []()
+        //                     { return is_pic_getable; });
+        // output_frame.mat = frame_.mat.clone();
+        // output_frame.time = frame_.time;
+        // is_pic_getable = false;
+        // while (!pic_queue.pop(output_frame))
+        // {
+        //     std::this_thread::yield();
+        // };
+        while (!my_pic_queue.pop(output_frame))
+        {
+            std::this_thread::yield();
+        }
     }
     void SharedData::setLightbar(std::priority_queue<lightBarNode> lightBar_)
     {
-        {
-            std::unique_lock<std::mutex> mutex_(mutex_lightBar_);
-            is_lightBar_getable = false;
-            lightBarsQue_ = lightBar_;
-        }
-        is_lightBar_getable = true;
-        condition_lightBar_.notify_one();
+        // {
+        //     std::unique_lock<std::mutex> mutex_(mutex_lightBar_);
+        //     is_lightBar_getable = false;
+        //     lightBarsQue_ = lightBar_;
+        // }
+        // is_lightBar_getable = true;
+        // condition_lightBar_.notify_one();
+        my_lightBar_queue.push(lightBar_);
     }
     void SharedData::getLightbar(std::priority_queue<lightBarNode> &lightBar_)
     {
+        // {
+        //     std::unique_lock<std::mutex> mutex_(mutex_lightBar_);
+        //     condition_lightBar_.wait(mutex_, []()
+        //                              { return is_lightBar_getable; });
+        //     lightBar_ = lightBarsQue_;
+        // }
+        // is_lightBar_getable = false;
+        while (!my_lightBar_queue.pop(lightBar_))
         {
-            std::unique_lock<std::mutex> mutex_(mutex_lightBar_);
-            condition_lightBar_.wait(mutex_, []()
-                                     { return is_lightBar_getable; });
-            lightBar_ = lightBarsQue_;
+            std::this_thread::yield();
         }
-        is_lightBar_getable = false;
     }
     void SharedData::setArmor(std::priority_queue<armorNode> armor_)
     {

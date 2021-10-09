@@ -28,7 +28,7 @@ namespace ly
         int colour;
         int thresh_;
 
-        lightBarNode ImageProcess(cv::Mat &rawPic, int is_use_roi = 0, cv::Point2f ROI_Pt_ = cv::Point2f(0, 0));
+        lightBarNode ImageProcess(cv::Mat &rawPic, int is_use_roi, cv::Point2f ROI_Pt_ = cv::Point2f(0, 0));
         void detectByROI(Mat &rawPic, std::priority_queue<ly::lightBarNode> preLBQ);
         void GlobalDetect(Mat &rawPic);
     };

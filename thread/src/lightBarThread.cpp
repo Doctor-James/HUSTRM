@@ -11,7 +11,7 @@ namespace ly
     lightBarThread::lightBarThread(cam_param cam_config, lightBar_param config)
     {
         lightBar_ = new lightBar(std::move(config));
-        start(1000);
+        start(8000);
     }
     lightBarThread::~lightBarThread()
     {
@@ -19,24 +19,26 @@ namespace ly
     }
     void lightBarThread::process()
     {
+        counter_.countBegin();
         share_->getPic(pic_);
+        counter_.countEnd();
+        std::cout << counter_.getTimeMs() << std::endl;
         if (pic_.mat.empty())
         {
             std::cout << "cannot get photo" << std::endl;
             return;
         }
         lightBar_->detect(pic_, preQue_); //在roi中检测lightBar
+
         share_->setLightbar(lightBar_->lightBarsQue_);
         preQue_ = ROI(lightBar_->lightBarsQue_);
-        if (!preQue_.empty())
-        {
-            std::cout << lightBar_->lightBarsQue_.top().sum << " ";
-            std::cout << preQue_.top().sum << std::endl;
-        }
+        // if (!preQue_.empty())
+        // {
+        //     std::cout << lightBar_->lightBarsQue_.top().sum << " ";
+        //     std::cout << preQue_.top().sum << std::endl;
+        // }
+
         debug_show();
-        // counter_.countEnd();
-        // std::cout << counter_.getTimeMs() << std::endl;
-        // counter_.countBegin();
     }
     void lightBarThread::debug_show()
     {

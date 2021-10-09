@@ -37,6 +37,7 @@ namespace ly
     }
     solvePNP::~solvePNP()
     {
+        delete transform_;
     }
     //设置相机内参
     void solvePNP::setCameraMatrix(double fx, double fy, double u0, double v0)

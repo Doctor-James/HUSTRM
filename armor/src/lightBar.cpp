@@ -14,14 +14,15 @@ namespace ly
     }
     void lightBar::detect(Mat &rawPic, std::priority_queue<ly::lightBarNode> preLBQ) //灯条线程处理函数
     {
-        if (preLBQ.empty() || preLBQ.top().sum < MIN_PREQUE_SCORE) //没有前一帧的检测数据或前一帧的检测数据很差
-        {
-            GlobalDetect(rawPic);
-        }
-        else
-        {
-            detectByROI(rawPic, preLBQ);
-        }
+        // if (preLBQ.empty() || preLBQ.top().sum < MIN_PREQUE_SCORE) //没有前一帧的检测数据或前一帧的检测数据很差
+        // {
+        //     GlobalDetect(rawPic);
+        // }
+        // else
+        // {
+        //     detectByROI(rawPic, preLBQ);
+        // }
+        GlobalDetect(rawPic);
     }
     void lightBar::GlobalDetect(Mat &rawPic)
     {
@@ -29,7 +30,7 @@ namespace ly
         {
             lightBarsQue_.pop();
         }
-        ImageProcess(rawPic.mat);
+        ImageProcess(rawPic.mat, 0);
     }
     lightBarNode lightBar::ImageProcess(cv::Mat &rawPic, int is_use_roi, cv::Point2f ROI_Pt_)
     {
@@ -139,16 +140,17 @@ namespace ly
                 temp_lightBarQue_.push(node);
             }
         }
-        if (is_use_roi == 0)
-        {
-            std::cout << "global" << std::endl;
-            lightBarsQue_ = temp_lightBarQue_;
-        }
-        else
-        {
-            std::cout << "roi" << std::endl;
-            return temp_lightBarQue_.top();
-        }
+        lightBarsQue_ = temp_lightBarQue_; //记得要去除
+        // if (is_use_roi == 0)
+        // {
+        //     std::cout << "global" << std::endl;
+        //     lightBarsQue_ = temp_lightBarQue_;
+        // }
+        // else
+        // {
+        //     std::cout << "roi" << std::endl;
+        //     return temp_lightBarQue_.top();
+        // }
     }
     //根据ROI或者全局检测灯条（1个），返回最优灯条或空灯条
     void lightBar::detectByROI(Mat &rawPic, std::priority_queue<ly::lightBarNode> preLBQ)
